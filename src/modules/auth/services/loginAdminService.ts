@@ -1,5 +1,5 @@
 export async function loginAdminService(email: string, password: string) {
-    const response = await fetch("https://plantas-be.onrender.com/auth/login-admin", {
+    const response = await fetch("https://jardindeploy.onrender.com/auth/login-admin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

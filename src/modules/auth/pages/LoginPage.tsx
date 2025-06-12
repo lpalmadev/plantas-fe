@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthGreenPanel from "../../core/components/background/AuthGreenPanel";
 import { Button } from "../../core/components/ui/button";
 import { loginAdminService } from "../services/loginAdminService";
@@ -8,6 +9,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -16,8 +18,7 @@ const LoginPage = () => {
 
         try {
             await loginAdminService(email, password);
-            alert("¡Inicio de sesión exitoso!");
-            // Aquí puedes redirigir si lo necesitas(poner el panel plantas)
+            navigate("/catalogo-plantas");
         } catch (err: any) {
             console.error("Error en login:", err);
             setError(err.message || "Ocurrió un error de autenticación");
