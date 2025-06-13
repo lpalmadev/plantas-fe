@@ -21,5 +21,9 @@ export async function loginAdminService(email: string, password: string) {
         localStorage.setItem("token", data.token);
     }
 
+    if (data.user?.type) {
+        localStorage.setItem("type", data.user.type)
+    }
+
     return data;
 }

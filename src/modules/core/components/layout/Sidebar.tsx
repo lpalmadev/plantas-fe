@@ -1,25 +1,35 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ReactComponent as MenuIcon } from "../../../../assets/icons/MenuIcon.svg";
-import { ReactComponent as PlantIcon } from "../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as StatsIcon } from "../../../../assets/icons/StatsIcon.svg";
+import { ReactComponent as PlantIcon } from "../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../assets/icons/FaqIcon.svg";
 import { ReactComponent as UserIcon } from "../../../../assets/icons/UserIcon.svg";
 import { ReactComponent as UserGeneralIcon } from "../../../../assets/icons/UserGeneralIcon.svg";
 import { ReactComponent as UserAdminIcon } from "../../../../assets/icons/UserAdminIcon.svg";
-import { ReactComponent as ProfileIcon } from "../../../../assets/icons/ProfileIcon.svg";
 import { ReactComponent as LogoutIcon } from "../../../../assets/icons/LogoutIcon.svg";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const SubIcon = () => (
     <div className="w-5 h-5 rounded bg-green-500/30" />
 );
 
-const Sidebar = () => {
-    const [open, setOpen] = useState(false);
+const SIDEBAR_WIDTH_OPEN = "w-64";
+const SIDEBAR_WIDTH_CLOSED = "w-16";
+
+const mockUser = {
+    name: "Deisy López",
+    avatarUrl: "",
+};
+
+const Sidebar = ({ user = mockUser }) => {
+    const [open, setOpen] = useState(true);
     const [faqOpen, setFaqOpen] = useState(false);
     const [usersOpen, setUsersOpen] = useState(false);
-    const [active, setActive] = useState<string | null>("plants");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const userType = localStorage.getItem("type");
 
     const menuItems = [
         {
@@ -39,7 +49,10 @@ const Sidebar = () => {
             label: "Gestión de usuarios",
             subItems: [
                 { id: "user-general", label: "General", icon: <UserGeneralIcon className="w-5 h-5" /> },
-                { id: "user-admin", label: "Administrador", icon: <UserAdminIcon className="w-5 h-5" />, route: "/users/admin" },
+                // SOLO mostrar si es superadmin:
+                ...(userType === "superadmin"
+                    ? [{ id: "user-admin", label: "Administrador", icon: <UserAdminIcon className="w-5 h-5" />, route: "/users/admin" }]
+                    : [])
             ],
         },
         {
@@ -53,9 +66,21 @@ const Sidebar = () => {
                 { id: "faq-program", label: "Programación de FAQ", icon: <SubIcon /> },
             ],
         },
+    ];
+
+    const bottomItems = [
         {
             id: "profile",
-            icon: <ProfileIcon className="w-6 h-6" />,
+            icon: (
+                <Avatar className="w-6 h-6">
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
+                    <AvatarFallback>
+                        {user.name
+                            ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+                            : "US"}
+                    </AvatarFallback>
+                </Avatar>
+            ),
             label: "Perfil",
             route: "/perfil",
         },
@@ -63,109 +88,58 @@ const Sidebar = () => {
             id: "logout",
             icon: <LogoutIcon className="w-6 h-6" />,
             label: "Cerrar sesión",
+            onClick: () => {},
         },
     ];
 
+    const pathname = location.pathname;
+
+    const isSubActive = (subItems) => subItems?.some(sub => sub.route && pathname.startsWith(sub.route));
+
     return (
         <nav
-            className={`flex flex-col justify-between h-screen ${
-                open ? "w-56" : "w-16"
-            } bg-green-600 transition-all duration-300`}
+            className={`flex flex-col h-screen 
+        ${open ? SIDEBAR_WIDTH_OPEN : SIDEBAR_WIDTH_CLOSED}
+        bg-green-600 transition-all duration-300`}
         >
-            <div className="flex flex-col">
-                <button
-                    className="flex items-center justify-center h-16"
-                    onClick={() => setOpen(!open)}
-                >
-                    <MenuIcon className="w-8 h-8" />
-                </button>
+            <button
+                className="flex items-center justify-center h-20"
+                onClick={() => setOpen(!open)}
+            >
+                <MenuIcon className="w-6 h-6" />
+            </button>
 
-                <ul className="flex flex-col gap-2 mt-4">
+            <div className="flex-1 overflow-y-auto">
+                <ul className="flex flex-col gap-2 mt-2 pb-4">
                     {menuItems.map((item) => {
-                        if (item.id === "faq") {
-                            return (
-                                <li key={item.id}>
-                                    <button
-                                        onClick={() => {
-                                            setFaqOpen((prev) => !prev);
-                                            setActive("faq");
-                                        }}
-                                        className={`flex items-center gap-4 w-full px-3 py-3 rounded-lg
-                                            ${
-                                            active === "faq"
-                                                ? "bg-green-700"
-                                                : "hover:bg-green-500/70"
-                                        }
-                                        `}
-                                    >
-                                        <span className="text-white">{item.icon}</span>
-                                        {open && (
-                                            <span className="text-white font-medium">{item.label}</span>
-                                        )}
-                                        {open && (
-                                            <svg
-                                                className={`w-4 h-4 ml-auto transform transition-transform ${
-                                                    faqOpen ? "rotate-90" : ""
-                                                }`}
-                                                fill="none"
-                                                stroke="white"
-                                                strokeWidth={2}
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                    {open && faqOpen && (
-                                        <ul className="pl-6">
-                                            {item.subItems?.map((sub) => (
-                                                <li key={sub.id}>
-                                                    <button
-                                                        onClick={() => setActive(sub.id)}
-                                                        className={`flex items-center gap-3 w-full px-2 py-2 rounded-md
-                                                            ${
-                                                            active === sub.id
-                                                                ? "bg-green-700"
-                                                                : "hover:bg-green-500/70"
-                                                        }
-                                                        `}
-                                                    >
-                                                        <span className="text-white">{sub.icon}</span>
-                                                        <span className="text-white text-sm">{sub.label}</span>
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </li>
-                            );
-                        }
+                        if (item.subItems) {
+                            // No mostrar el menú si no hay subItems
+                            if (!item.subItems.length) return null;
+                            const isOpen = item.id === "faq" ? faqOpen : usersOpen;
+                            const setOpenFn = item.id === "faq" ? setFaqOpen : setUsersOpen;
+                            const subActive = isSubActive(item.subItems);
 
-                        if (item.id === "users") {
                             return (
                                 <li key={item.id}>
                                     <button
-                                        onClick={() => {
-                                            setUsersOpen((prev) => !prev);
-                                            setActive("users");
-                                        }}
-                                        className={`flex items-center gap-4 w-full px-3 py-3 rounded-lg
-                                            ${
-                                            active === "users"
-                                                ? "bg-green-700"
-                                                : "hover:bg-green-500/70"
-                                        }
+                                        onClick={() => setOpenFn((prev) => !prev)}
+                                        className={`
+                                            flex items-center rounded-lg transition-colors
+                                            ${open ? "pl-5 pr-3 py-3 gap-4 w-full" : "justify-center p-0 w-full h-14"}
+                                            ${subActive ? "bg-green-700" : "hover:bg-green-500/70"}
                                         `}
                                     >
-                                        <span className="text-white">{item.icon}</span>
+                                        <span className={`flex items-center justify-center text-white w-8 h-8`}>
+                                            {item.icon}
+                                        </span>
                                         {open && (
-                                            <span className="text-white font-medium">{item.label}</span>
+                                            <span className="text-white font-semibold text-base text-left flex-1 truncate">
+                                                {item.label}
+                                            </span>
                                         )}
                                         {open && (
                                             <svg
-                                                className={`w-4 h-4 ml-auto transform transition-transform ${
-                                                    usersOpen ? "rotate-90" : ""
-                                                }`}
+                                                className={`w-4 h-4 ml-auto transition-transform ${isOpen ? "rotate-90" : ""}`}
                                                 fill="none"
                                                 stroke="white"
                                                 strokeWidth={2}
@@ -175,23 +149,17 @@ const Sidebar = () => {
                                             </svg>
                                         )}
                                     </button>
-                                    {open && usersOpen && (
-                                        <ul className="pl-6">
-                                            {item.subItems?.map((sub) => (
+                                    {open && isOpen && (
+                                        <ul className="ml-8 mt-1 flex flex-col gap-1">
+                                            {item.subItems.map((sub) => (
                                                 <li key={sub.id}>
                                                     <button
                                                         onClick={() => {
-                                                            setActive(sub.id);
-                                                            if (sub.route) {
-                                                                navigate(sub.route);
-                                                            }
+                                                            if (sub.route) navigate(sub.route);
                                                         }}
-                                                        className={`flex items-center gap-3 w-full px-2 py-2 rounded-md
-                                                            ${
-                                                            active === sub.id
-                                                                ? "bg-green-700"
-                                                                : "hover:bg-green-500/70"
-                                                        }
+                                                        className={`
+                                                            flex items-center gap-2 w-full rounded-md px-2 py-2
+                                                            ${pathname === sub.route ? "bg-green-700" : "hover:bg-green-500/70"}
                                                         `}
                                                     >
                                                         <span className="text-white">{sub.icon}</span>
@@ -204,27 +172,25 @@ const Sidebar = () => {
                                 </li>
                             );
                         }
-
                         return (
                             <li key={item.id}>
                                 <button
                                     onClick={() => {
-                                        setActive(item.id);
-                                        if (item.route) {
-                                            navigate(item.route);
-                                        }
+                                        if (item.route) navigate(item.route);
                                     }}
-                                    className={`flex items-center gap-4 w-full px-3 py-3 rounded-lg 
-                                        ${
-                                        active === item.id
-                                            ? "bg-green-700"
-                                            : "hover:bg-green-500/70"
-                                    }
+                                    className={`
+                                        flex items-center rounded-lg transition-colors
+                                        ${open ? "pl-5 pr-3 py-3 gap-4 w-full" : "justify-center p-0 w-full h-14"}
+                                        ${pathname === item.route ? "bg-green-700" : "hover:bg-green-500/70"}
                                     `}
                                 >
-                                    <span className="text-white">{item.icon}</span>
+                                    <span className={`flex items-center justify-center text-white w-8 h-8`}>
+                                        {item.icon}
+                                    </span>
                                     {open && (
-                                        <span className="text-white font-medium">{item.label}</span>
+                                        <span className="text-white font-semibold text-base text-left flex-1 truncate">
+                                            {item.label}
+                                        </span>
                                     )}
                                 </button>
                             </li>
@@ -232,7 +198,32 @@ const Sidebar = () => {
                     })}
                 </ul>
             </div>
-            <div className="flex flex-col items-center mb-4"></div>
+
+            <div className="flex flex-col gap-2 p-3 border-t border-green-500/40">
+                {bottomItems.map(item => (
+                    <button
+                        key={item.id}
+                        onClick={() => {
+                            if (item.route) navigate(item.route);
+                            if (item.onClick) item.onClick();
+                        }}
+                        className={`
+                            flex items-center rounded-lg transition-colors
+                            ${open ? "pl-5 pr-3 py-3 gap-4 w-full" : "justify-center p-0 w-full h-14"}
+                            ${pathname === item.route ? "bg-green-700" : "hover:bg-green-500/70"}
+                        `}
+                    >
+                        <span className="flex items-center justify-center text-white w-8 h-8">
+                            {item.icon}
+                        </span>
+                        {open && (
+                            <span className="text-white font-semibold text-base text-left flex-1 truncate">
+                                {item.label}
+                            </span>
+                        )}
+                    </button>
+                ))}
+            </div>
         </nav>
     );
 };

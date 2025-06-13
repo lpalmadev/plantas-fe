@@ -12,7 +12,7 @@ const buttonVariants = cva(
                 default:
                     "bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition", //Botón principal
                 destructive:
-                    "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+                    "bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-lg shadow",
                 outline:
                     "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
                 secondary:

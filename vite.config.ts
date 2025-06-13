@@ -7,7 +7,22 @@ import { defineConfig } from "vite"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), svgr(), tailwindcss()],
+  plugins: [
+    react(),
+    svgr({
+      exportType: 'named',
+      svgoConfig: {
+        multipass: true,
+        plugins: [
+          {
+            name: 'removeViewBox',
+            active: false
+          }
+        ]
+      }
+    }),
+    tailwindcss()
+  ],
   server: {
     port: 5174,
     strictPort: true

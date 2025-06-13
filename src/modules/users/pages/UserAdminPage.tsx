@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "../../core/components/layout/Sidebar";
 import { DataTable } from "../../core/components/ui/data-table";
 import { userAdminColumns, UserAdmin } from "../components/columns/user-admin-columns";
+import { Button } from "../../core/components/ui/button";
+import { UserCreateModal } from "../components/UserCreateModal";
 
 const adminData: UserAdmin[] = [];
 
 const UserAdminPage = () => {
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleUserCreated = (userData: any) => {
+        console.log("Usuario creado:", userData);
+    };
 
     return (
         <div className="flex h-screen">
@@ -15,13 +22,18 @@ const UserAdminPage = () => {
                     <h1 className="text-2xl font-bold text-green-900">Gestión de Administradores</h1>
                 </div>
                 <div className="flex justify-end px-8 mb-6">
-                    <button className="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-lg shadow">
+                    <Button variant="destructive" onClick={() => setModalOpen(true)}>
                         Crear usuario
-                    </button>
+                    </Button>
                 </div>
                 <div className="px-8">
                     <DataTable columns={userAdminColumns} data={adminData} />
                 </div>
+                <UserCreateModal
+                    open={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onSubmitSuccess={handleUserCreated}
+                />
             </main>
         </div>
     );
