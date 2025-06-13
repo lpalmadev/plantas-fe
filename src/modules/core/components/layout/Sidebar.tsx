@@ -68,6 +68,12 @@ const Sidebar = ({ user = mockUser }) => {
         },
     ];
 
+    const handleLogout = () => {
+        localStorage.removeItem("type");
+        localStorage.removeItem("token")
+        navigate("/login");
+    };
+
     const bottomItems = [
         {
             id: "profile",
@@ -88,7 +94,7 @@ const Sidebar = ({ user = mockUser }) => {
             id: "logout",
             icon: <LogoutIcon className="w-6 h-6" />,
             label: "Cerrar sesión",
-            onClick: () => {},
+            onClick: handleLogout,
         },
     ];
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../core/components/layout/Sidebar";
 import { DataTable } from "../../core/components/ui/data-table";
 import { userAdminColumns, UserAdmin } from "../components/columns/user-admin-columns";
