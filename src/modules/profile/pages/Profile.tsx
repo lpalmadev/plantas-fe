@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "../../core/components/layout/Sidebar";
+import Sidebar from "../../core/components/layout/sidebar";
 
 const Profile = () => {
     return (

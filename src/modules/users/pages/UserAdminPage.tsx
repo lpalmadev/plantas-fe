@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Sidebar from "../../core/components/layout/Sidebar";
+import Sidebar from "../../core/components/layout/sidebar";
 import { DataTable } from "../../core/components/ui/data-table";
 import { userAdminColumns, UserAdmin } from "../components/columns/user-admin-columns";
 import { Button } from "../../core/components/ui/button";

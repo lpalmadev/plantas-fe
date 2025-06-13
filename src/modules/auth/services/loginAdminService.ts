@@ -1,5 +1,9 @@
-export async function loginAdminService(email: string, password: string) {
-    const response = await fetch("https://jardindeploy.onrender.com/auth/login-admin", {
+import { LoginResponse } from "../lib/types";
+import { API_ENDPOINTS } from "../lib/constants";
+import { setAuthToken, setUserType } from "../utils/authUtils";
+
+export async function loginAdminService(email: string, password: string): Promise<LoginResponse> {
+    const response = await fetch(API_ENDPOINTS.LOGIN_ADMIN, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -18,11 +22,11 @@ export async function loginAdminService(email: string, password: string) {
     const data = await response.json();
 
     if (data.token) {
-        localStorage.setItem("token", data.token);
+        setAuthToken(data.token);
     }
 
     if (data.user?.type) {
-        localStorage.setItem("type", data.user.type)
+        setUserType(data.user.type);
     }
 
     return data;
