@@ -5,7 +5,7 @@ import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import Profile from "../../profile/pages/Profile";
 import CatalogyPlants from "../../plants/pages/CatalogyPlants";
-import UserAdminPage from "../../users/pages/UserAdminPage";
+import UserAdminPage from "../../users/UserPage";
 import ModulePage from "../../module/ModulePage";
 import RolePage from "../../roles/RolePage";
 
