@@ -30,7 +30,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      //agregar lo mismo, pero de los assets
     },
   },
 })

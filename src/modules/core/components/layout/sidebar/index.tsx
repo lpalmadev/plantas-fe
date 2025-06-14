@@ -22,6 +22,8 @@ import { ReactComponent as FaqIcon2 } from "../../../../../assets/icons/FaqIcon2
 import { ReactComponent as UserIcon } from "../../../../../assets/icons/UserIcon.svg";
 import { ReactComponent as UserGeneralIcon } from "../../../../../assets/icons/UserGeneralIcon.svg";
 import { ReactComponent as UserAdminIcon } from "../../../../../assets/icons/UserAdminIcon.svg";
+import { ReactComponent as ManagmentModulesIcon } from "../../../../../assets/icons/ManagmentModulesIcon.svg";
+import { ReactComponent as ManagmentRolesIcon } from "../../../../../assets/icons/ManagmentRolesIcon.svg";
 import { ReactComponent as LogoutIcon } from "../../../../../assets/icons/LogoutIcon.svg";
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import { useNavigate } from "react-router-dom";
@@ -83,6 +85,28 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                     : []),
             ],
         },
+        ...(userType === "superadmin"
+                ? [
+                    {
+                        id: "modules",
+                        icon: <ManagmentModulesIcon className="w-6 h-6" />,
+                        label: "Gestión de Módulos",
+                        route: "/modules",
+                    }
+                ]
+                : []
+        ),
+        ...(userType === "superadmin"
+                ? [
+                    {
+                        id: "roles",
+                        icon: <ManagmentRolesIcon className="w-6 h-6" />,
+                        label: "Gestión de Roles",
+                        route: "/roles",
+                    }
+                ]
+                : []
+        ),
         {
             id: "faq",
             icon: <FaqIcon className="w-6 h-6" />,

@@ -6,6 +6,8 @@ import LoginPage from "../../auth/pages/LoginPage";
 import Profile from "../../profile/pages/Profile";
 import CatalogyPlants from "../../plants/pages/CatalogyPlants";
 import UserAdminPage from "../../users/pages/UserAdminPage";
+import ModulePage from "../../module/ModulePage";
+import RolePage from "../../roles/RolePage";
 
 export default function MainRouter() {
     return (
@@ -17,6 +19,8 @@ export default function MainRouter() {
                 <Route path={ROUTES.PROFILE} element={<Profile />} />
                 <Route path={ROUTES.CATALOG_PLANTS} element={<CatalogyPlants />} />
                 <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
+                <Route path={ROUTES.MODULES} element={<ModulePage />} />
+                <Route path={ROUTES.USER_ROLE} element={<RolePage />} />
             </Route>
         </Routes>
     );
