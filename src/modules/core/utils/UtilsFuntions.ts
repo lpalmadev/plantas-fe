@@ -17,3 +17,18 @@ export const getUserType = (): string | null => {
 export const isAuthenticated = (): boolean => {
     return !!getAuthToken();
 };
+
+export const getHeaders = () => {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+    };
+};
+
+export  const removetoken = () => {
+    return localStorage.removeItem("token");
+}
+
+export  const removetype = () => {
+    return localStorage.removeItem("type");
+}

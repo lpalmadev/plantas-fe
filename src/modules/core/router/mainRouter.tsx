@@ -5,9 +5,9 @@ import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import Profile from "../../profile/pages/Profile";
 import CatalogyPlants from "../../plants/pages/CatalogyPlants";
-import UserAdminPage from "../../users/UserPage";
-import ModulePage from "../../module/ModulePage";
-import RolePage from "../../roles/RolePage";
+import UserAdminPage from "../../users/pages/UserPage.tsx";
+import ModulePage from "../../module/pages/ModulePage.tsx";
+import RolePage from "../../roles/pages/RolePage.tsx";
 
 export default function MainRouter() {
     return (

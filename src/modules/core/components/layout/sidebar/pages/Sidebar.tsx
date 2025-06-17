@@ -1,31 +1,31 @@
 import { useLocation } from "react-router-dom";
 
 // Hooks
-import { useSidebarState } from "./hooks/useSidebarState";
+import { useSidebarState } from "../hooks/useSidebarState.tsx";
 
 // Components
-import SidebarToggle from "./components/SidebarToggle";
-import SidebarItem from "./components/SidebarItem";
-import SidebarSubItem from "./components/SidebarSubItem";
-import SidebarBottomItem from "./components/SidebarBottomItem";
+import SidebarToggle from "../components/SidebarToggle.tsx";
+import SidebarItem from "../components/SidebarItem.tsx";
+import SidebarSubItem from "../components/SidebarSubItem.tsx";
+import SidebarBottomItem from "../components/SidebarBottomItem.tsx";
 
 
-import { MenuItem, SidebarProps, User } from "./types";
+import { MenuItem, SidebarProps, User } from "../lib/types.ts";
 
-import { ReactComponent as StatsIcon } from "../../../../../assets/icons/StatsIcon.svg";
-import { ReactComponent as PlantIcon } from "../../../../../assets/icons/PlantIcon.svg";
-import { ReactComponent as FaqIcon } from "../../../../../assets/icons/FaqIcon.svg";
-import { ReactComponent as UserReportsIcon } from "../../../../../assets/icons/UserReportsIcon.svg";
-import { ReactComponent as PersonalReportsIcon } from "../../../../../assets/icons/PersonalReportsIcon.svg";
-import { ReactComponent as ReportsAttendedIcon } from "../../../../../assets/icons/ReportsAttendedIcon.svg";
-import { ReactComponent as FaqIcon2 } from "../../../../../assets/icons/FaqIcon2.svg";
-import { ReactComponent as UserIcon } from "../../../../../assets/icons/UserIcon.svg";
-import { ReactComponent as UserGeneralIcon } from "../../../../../assets/icons/UserGeneralIcon.svg";
-import { ReactComponent as UserAdminIcon } from "../../../../../assets/icons/UserAdminIcon.svg";
-import { ReactComponent as ManagmentModulesIcon } from "../../../../../assets/icons/ManagmentModulesIcon.svg";
-import { ReactComponent as ManagmentRolesIcon } from "../../../../../assets/icons/ManagmentRolesIcon.svg";
-import { ReactComponent as LogoutIcon } from "../../../../../assets/icons/LogoutIcon.svg";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
+import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
+import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
+import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
+import { ReactComponent as UserReportsIcon } from "../../../../../../assets/icons/UserReportsIcon.svg";
+import { ReactComponent as PersonalReportsIcon } from "../../../../../../assets/icons/PersonalReportsIcon.svg";
+import { ReactComponent as ReportsAttendedIcon } from "../../../../../../assets/icons/ReportsAttendedIcon.svg";
+import { ReactComponent as FaqIcon2 } from "../../../../../../assets/icons/FaqIcon2.svg";
+import { ReactComponent as UserIcon } from "../../../../../../assets/icons/UserIcon.svg";
+import { ReactComponent as UserGeneralIcon } from "../../../../../../assets/icons/UserGeneralIcon.svg";
+import { ReactComponent as UserAdminIcon } from "../../../../../../assets/icons/UserAdminIcon.svg";
+import { ReactComponent as ManagmentModulesIcon } from "../../../../../../assets/icons/ManagmentModulesIcon.svg";
+import { ReactComponent as ManagmentRolesIcon } from "../../../../../../assets/icons/ManagmentRolesIcon.svg";
+import { ReactComponent as LogoutIcon } from "../../../../../../assets/icons/LogoutIcon.svg";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../ui/avatar.tsx";
 import { useNavigate } from "react-router-dom";
 
 // Constants

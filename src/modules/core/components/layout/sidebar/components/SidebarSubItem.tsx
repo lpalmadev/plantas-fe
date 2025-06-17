@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { SubMenuItem } from "../types";
+import { SubMenuItem } from "../lib/types.ts";
 
 interface SidebarSubItemProps {
     subItem: SubMenuItem;

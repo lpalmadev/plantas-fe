@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "../../core/components/layout/sidebar";
+import Sidebar from "../../core/components/layout/sidebar/pages/Sidebar.tsx";
 
 const CatalogyPlants = () => {
     return (

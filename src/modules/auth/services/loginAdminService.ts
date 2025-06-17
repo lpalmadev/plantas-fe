@@ -1,6 +1,6 @@
 import { LoginResponse } from "../lib/types";
-import { API_ENDPOINTS } from "../lib/constants";
-import { setAuthToken, setUserType } from "../utils/authUtils";
+import { API_ENDPOINTS } from "../../core/lib/enpoints.ts";
+import { setAuthToken, setUserType } from "../../core/utils/UtilsFuntions.ts";
 
 export async function loginAdminService(email: string, password: string): Promise<LoginResponse> {
     const response = await fetch(API_ENDPOINTS.LOGIN_ADMIN, {
@@ -8,10 +8,7 @@ export async function loginAdminService(email: string, password: string): Promis
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            email,
-            password,
-        }),
+        body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
@@ -21,13 +18,8 @@ export async function loginAdminService(email: string, password: string): Promis
 
     const data = await response.json();
 
-    if (data.token) {
-        setAuthToken(data.token);
-    }
-
-    if (data.user?.type) {
-        setUserType(data.user.type);
-    }
+    if (data.token) setAuthToken(data.token);
+    if (data.user?.type) setUserType(data.user.type);
 
     return data;
 }

@@ -31,9 +31,7 @@ export const permissionLabels: Record<PermissionType, string> = {
 
 export const validatePermissions = (permissions: PermissionType[]): boolean => {
     if (permissions.length === 0) return true;
-
     const hasOtherPermissions = permissions.some(p => p !== "READ");
     const hasReadPermission = permissions.includes("READ");
-
     return !hasOtherPermissions || (hasOtherPermissions && hasReadPermission);
 };

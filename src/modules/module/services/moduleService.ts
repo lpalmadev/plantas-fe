@@ -1,25 +1,13 @@
-import { Module, CreateModuleDTO } from "../types";
+import { Module, CreateModuleDTO } from "../lib/types.ts";
+import { API_ENDPOINTS } from "../../core/lib/enpoints.ts";
+import { getHeaders } from "../../core/utils/UtilsFuntions.ts";
 
-const API_URL = "https://jardindeploy.onrender.com";
 
-
-const getAuthToken = (): string => {
-    if (typeof window !== 'undefined') {
-        return localStorage.getItem('token') || '';
-    }
-    return '';
-};
-const getHeaders = () => {
-    return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
-    };
-};
 
 export const moduleService = {
     getAllModules: async (): Promise<Module[]> => {
         try {
-            const response = await fetch(`${API_URL}/modules`, {
+            const response = await fetch(API_ENDPOINTS.MODULE, {
                 headers: getHeaders()
             });
 
@@ -35,7 +23,7 @@ export const moduleService = {
 
     createModule: async (moduleData: CreateModuleDTO): Promise<Module> => {
         try {
-            const response = await fetch(`${API_URL}/modules`, {
+            const response = await fetch(API_ENDPOINTS.MODULE, {
                 method: "POST",
                 headers: getHeaders(),
                 body: JSON.stringify(moduleData),
@@ -55,7 +43,7 @@ export const moduleService = {
 
     activateModule: async (moduleId: string): Promise<void> => {
         try {
-            const response = await fetch(`${API_URL}/modules/${moduleId}/activate`, {
+            const response = await fetch(API_ENDPOINTS.MODULE_BY_ID(moduleId), {
                 method: "PUT",
                 headers: getHeaders()
             });
@@ -72,7 +60,7 @@ export const moduleService = {
 
     deactivateModule: async (moduleId: string): Promise<void> => {
         try {
-            const response = await fetch(`${API_URL}/modules/${moduleId}/deactivate`, {
+            const response = await fetch(API_ENDPOINTS.MODULE_BY_ID(moduleId), {
                 method: "PUT",
                 headers: getHeaders()
             });

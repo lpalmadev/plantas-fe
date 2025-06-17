@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { MenuItem } from "../types";
+import { MenuItem } from "../lib/types.ts";
 
 interface SidebarItemProps {
     item: MenuItem;
