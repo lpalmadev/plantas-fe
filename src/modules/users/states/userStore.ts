@@ -9,7 +9,6 @@ interface UserState {
     error: string | null;
     creating: boolean;
 
-    // Acciones
     fetchUsers: () => Promise<void>;
     fetchRoles: () => Promise<void>;
     createUser: (userData: CreateUserDTO) => Promise<void>;

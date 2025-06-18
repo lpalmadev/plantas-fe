@@ -1,14 +1,11 @@
 import { useLocation } from "react-router-dom";
 
-// Hooks
 import { useSidebarState } from "../hooks/useSidebarState.tsx";
-
-// Components
+import { useThemeStore } from "../../../../states/themeStore";
 import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
 import SidebarBottomItem from "../components/SidebarBottomItem.tsx";
-
 
 import { MenuItem, SidebarProps, User } from "../lib/types.ts";
 
@@ -28,7 +25,6 @@ import { ReactComponent as LogoutIcon } from "../../../../../../assets/icons/Log
 import { Avatar, AvatarFallback, AvatarImage } from "../../../ui/avatar.tsx";
 import { useNavigate } from "react-router-dom";
 
-// Constants
 const SIDEBAR_WIDTH_OPEN = "w-64";
 const SIDEBAR_WIDTH_CLOSED = "w-16";
 
@@ -37,15 +33,20 @@ const SubIcon = () => (
 );
 
 const mockUser: User = {
-    name: "Deisy López",
-    avatarUrl: "",
+    name: "Deisy",
+    avatarUrl: "https://th.bing.com/th/id/R.af7b7bc053ca27c87f7c18fde9448467?rik=I9OjMbLUKMfQow&riu=http%3a%2f%2fimages7.memedroid.com%2fimages%2fUPLOADED852%2f6333a0372d364.jpeg&ehk=ujVn4U%2bHAJqhAmQYOjpyoIjqrzjkI6b%2fZg11xnqNzqo%3d&risl=&pid=ImgRaw&r=0",
 };
+
+const scrollbarHideClass = "scrollbar-none";
 
 const Sidebar = ({ user = mockUser }: SidebarProps) => {
     const { open, getSubmenuState, toggleSidebar, toggleSubmenu } = useSidebarState();
     const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
+
+    const { mode } = useThemeStore();
+    const isDark = mode === 'dark';
 
     const userType = localStorage.getItem("type");
 
@@ -148,58 +149,72 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
         subItems?.some(sub => sub.route && pathname.startsWith(sub.route));
 
     return (
-        <nav
-            className={`flex flex-col h-screen 
-      ${open ? SIDEBAR_WIDTH_OPEN : SIDEBAR_WIDTH_CLOSED}
-      bg-green-600 transition-all duration-300`}
-        >
-            <SidebarToggle onClick={toggleSidebar} />
+        <>
+            <style jsx>{`
+                .scrollbar-none::-webkit-scrollbar {
+                    display: none;
+                }
+                .scrollbar-none {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
 
-            <div className="flex-1 overflow-y-auto">
-                <ul className="flex flex-col gap-2 mt-2 pb-4">
-                    {menuItems.map((item) => {
-                        if (item.subItems) {
-                            if (!item.subItems.length) return null;
-                            const isSubmenuOpen = getSubmenuState(item.id);
-                            const subActive = isSubActive(item.subItems);
+            <nav
+                className={`flex flex-col h-screen 
+                    ${open ? SIDEBAR_WIDTH_OPEN : SIDEBAR_WIDTH_CLOSED}
+                    ${isDark ? 'bg-green-800' : 'bg-green-600'} 
+                    transition-all duration-300`
+                }
+            >
+                <SidebarToggle onClick={toggleSidebar} />
 
+                <div className={`flex-1 overflow-y-auto ${scrollbarHideClass}`}>
+                    <ul className="flex flex-col gap-2 mt-2 pb-4">
+                        {menuItems.map((item) => {
+                            if (item.subItems) {
+                                if (!item.subItems.length) return null;
+                                const isSubmenuOpen = getSubmenuState(item.id);
+                                const subActive = isSubActive(item.subItems);
+
+                                return (
+                                    <li key={item.id}>
+                                        <SidebarItem
+                                            item={item}
+                                            isOpen={open}
+                                            isSubmenuOpen={isSubmenuOpen}
+                                            toggleSubmenu={toggleSubmenu}
+                                            hasSubItems={true}
+                                            subActive={subActive}
+                                        />
+                                        {open && isSubmenuOpen && (
+                                            <ul className={`ml-8 mt-1 flex flex-col gap-1 ${isDark ? 'bg-green-900/30' : 'bg-green-700/30'} rounded-md py-1`}>
+                                                {item.subItems.map((subItem) => (
+                                                    <li key={subItem.id}>
+                                                        <SidebarSubItem subItem={subItem} />
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </li>
+                                );
+                            }
                             return (
                                 <li key={item.id}>
-                                    <SidebarItem
-                                        item={item}
-                                        isOpen={open}
-                                        isSubmenuOpen={isSubmenuOpen}
-                                        toggleSubmenu={toggleSubmenu}
-                                        hasSubItems={true}
-                                        subActive={subActive}
-                                    />
-                                    {open && isSubmenuOpen && (
-                                        <ul className="ml-8 mt-1 flex flex-col gap-1">
-                                            {item.subItems.map((subItem) => (
-                                                <li key={subItem.id}>
-                                                    <SidebarSubItem subItem={subItem} />
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
+                                    <SidebarItem item={item} isOpen={open} />
                                 </li>
                             );
-                        }
-                        return (
-                            <li key={item.id}>
-                                <SidebarItem item={item} isOpen={open} />
-                            </li>
-                        );
-                    })}
-                </ul>
-            </div>
+                        })}
+                    </ul>
+                </div>
 
-            <div className="flex flex-col gap-2 p-3 border-t border-green-500/40">
-                {bottomItems.map(item => (
-                    <SidebarBottomItem key={item.id} item={item} isOpen={open} />
-                ))}
-            </div>
-        </nav>
+                <div className={`flex flex-col gap-2 p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
+                    {bottomItems.map(item => (
+                        <SidebarBottomItem key={item.id} item={item} isOpen={open} />
+                    ))}
+                </div>
+            </nav>
+        </>
     );
 };
 

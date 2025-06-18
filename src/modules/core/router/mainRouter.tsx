@@ -4,7 +4,7 @@ import PrivateRouter from "./routers/PrivateRouter";
 import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import Profile from "../../profile/pages/Profile";
-import CatalogyPlants from "../../plants/pages/CatalogyPlants";
+import CatalogyPlants from "../../plants/pages/PlantPage.tsx";
 import UserAdminPage from "../../users/pages/UserPage.tsx";
 import ModulePage from "../../module/pages/ModulePage.tsx";
 import RolePage from "../../roles/pages/RolePage.tsx";
