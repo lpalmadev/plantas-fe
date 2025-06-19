@@ -3,15 +3,16 @@ import { LoginForm } from "../components/LoginForm";
 import AuthGreenPanel from "../../core/components/background/AuthGreenPanel";
 import { useAuth } from "../hooks/useAuth";
 import { useThemeStore } from "../../core/states/themeStore";
+import { ROUTES } from "../../core/router/path";
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login, loading, error, reset } = useAuth();
+    const { login, loginLoading, loginError, resetLoginError } = useAuth();
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
     const handleLoginSuccess = () => {
-        navigate("/catalogo-plantas");
+        navigate(ROUTES.CATALOG_PLANTS);
     };
 
     return (
@@ -24,8 +25,8 @@ const LoginPage = () => {
                     </h2>
                     <LoginForm
                         onLoginSuccess={handleLoginSuccess}
-                        loading={loading}
-                        error={error}
+                        loading={loginLoading}
+                        error={loginError}
                         login={login}
                     />
                 </div>

@@ -1,32 +1,27 @@
-import { useMutation } from "@tanstack/react-query";
-import { loginAdminService } from "../services/loginAdminService";
-import { useAuthStore } from "../states/authStore";
-import type { LoginResponse } from "../lib/types";
+import { useLoginMutation } from "./mutations/useLoginMutation";
+import { useLogoutMutation } from "./mutations/useLogoutMutation";
 
 export const useAuth = () => {
-    const { setAuthState, clearAuth } = useAuthStore();
-
-    const mutation = useMutation({
-        mutationFn: async ({ email, password }: { email: string; password: string }) => {
-            const data = await loginAdminService(email, password);
-            setAuthState(data);
-            return data;
-        }
-    });
+    const loginMutation = useLoginMutation();
+    const logoutMutation = useLogoutMutation();
 
     const login = async (email: string, password: string) => {
-        await mutation.mutateAsync({ email, password });
+        await loginMutation.mutateAsync({ email, password });
     };
 
     const logout = () => {
-        clearAuth();
+        logoutMutation.mutate();
     };
 
     return {
         login,
+        loginLoading: loginMutation.isPending,
+        loginError: loginMutation.error?.message || null,
+        resetLoginError: loginMutation.reset,
+
         logout,
-        loading: mutation.isLoading,
-        error: mutation.error ? (mutation.error as Error).message : null,
-        reset: mutation.reset,
+        logoutLoading: logoutMutation.isPending,
+        logoutError: logoutMutation.error?.message || null,
+        resetLogoutError: logoutMutation.reset,
     };
 };
