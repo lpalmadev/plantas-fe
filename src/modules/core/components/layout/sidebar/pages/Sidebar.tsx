@@ -5,10 +5,11 @@ import { useThemeStore } from "../../../../states/themeStore";
 import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
-import SidebarBottomItem from "../components/SidebarBottomItem.tsx";
+import ProfileDropdown from "../components/ProfileDropdown.tsx"; // ✅ NUEVO IMPORT
 
 import { MenuItem, SidebarProps, User } from "../lib/types.ts";
 
+// Todos tus iconos existentes...
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
@@ -21,16 +22,9 @@ import { ReactComponent as UserGeneralIcon } from "../../../../../../assets/icon
 import { ReactComponent as UserAdminIcon } from "../../../../../../assets/icons/UserAdminIcon.svg";
 import { ReactComponent as ManagmentModulesIcon } from "../../../../../../assets/icons/ManagmentModulesIcon.svg";
 import { ReactComponent as ManagmentRolesIcon } from "../../../../../../assets/icons/ManagmentRolesIcon.svg";
-import { ReactComponent as LogoutIcon } from "../../../../../../assets/icons/LogoutIcon.svg";
-import { Avatar, AvatarFallback, AvatarImage } from "../../../ui/avatar.tsx";
-import { useNavigate } from "react-router-dom";
 
 const SIDEBAR_WIDTH_OPEN = "w-64";
 const SIDEBAR_WIDTH_CLOSED = "w-16";
-
-const SubIcon = () => (
-    <div className="w-5 h-5 rounded bg-green-500/30" />
-);
 
 const mockUser: User = {
     name: "Deisy",
@@ -41,7 +35,6 @@ const scrollbarHideClass = "scrollbar-none";
 
 const Sidebar = ({ user = mockUser }: SidebarProps) => {
     const { open, getSubmenuState, toggleSidebar, toggleSubmenu } = useSidebarState();
-    const navigate = useNavigate();
     const location = useLocation();
     const pathname = location.pathname;
 
@@ -50,12 +43,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
 
     const userType = localStorage.getItem("type");
 
-    const handleLogout = () => {
-        localStorage.removeItem("type");
-        localStorage.removeItem("token");
-        navigate("/login");
-    };
-
+    // Tu array de menuItems existente (sin cambios)
     const menuItems: MenuItem[] = [
         {
             id: "plants",
@@ -121,30 +109,6 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
         },
     ];
 
-    const bottomItems: MenuItem[] = [
-        {
-            id: "profile",
-            icon: (
-                <Avatar className="w-6 h-6">
-                    <AvatarImage src={user.avatarUrl} alt={user.name} />
-                    <AvatarFallback>
-                        {user.name
-                            ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
-                            : "US"}
-                    </AvatarFallback>
-                </Avatar>
-            ),
-            label: "Perfil",
-            route: "/perfil",
-        },
-        {
-            id: "logout",
-            icon: <LogoutIcon className="w-6 h-6" />,
-            label: "Cerrar sesión",
-            onClick: handleLogout,
-        },
-    ];
-
     const isSubActive = (subItems: any[]) =>
         subItems?.some(sub => sub.route && pathname.startsWith(sub.route));
 
@@ -167,7 +131,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                     transition-all duration-300`
                 }
             >
-                <SidebarToggle onClick={toggleSidebar} />
+                <SidebarToggle onClick={toggleSidebar} isOpen={open} />
 
                 <div className={`flex-1 overflow-y-auto ${scrollbarHideClass}`}>
                     <ul className="flex flex-col gap-2 mt-2 pb-4">
@@ -208,10 +172,9 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                     </ul>
                 </div>
 
-                <div className={`flex flex-col gap-2 p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
-                    {bottomItems.map(item => (
-                        <SidebarBottomItem key={item.id} item={item} isOpen={open} />
-                    ))}
+                {/* ✅ CAMBIADO: ProfileDropdown en lugar de bottomItems */}
+                <div className={`flex flex-col p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
+                    <ProfileDropdown user={user} isOpen={open} />
                 </div>
             </nav>
         </>
