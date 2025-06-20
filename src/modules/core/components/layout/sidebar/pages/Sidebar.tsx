@@ -5,11 +5,10 @@ import { useThemeStore } from "../../../../states/themeStore";
 import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
-import ProfileDropdown from "../components/ProfileDropdown.tsx"; // ✅ NUEVO IMPORT
+import ProfileDropdown from "../components/ProfileDropdown.tsx";
 
 import { MenuItem, SidebarProps, User } from "../lib/types.ts";
 
-// Todos tus iconos existentes...
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
 import { ReactComponent as FaqIcon } from "../../../../../../assets/icons/FaqIcon.svg";
@@ -22,6 +21,10 @@ import { ReactComponent as UserGeneralIcon } from "../../../../../../assets/icon
 import { ReactComponent as UserAdminIcon } from "../../../../../../assets/icons/UserAdminIcon.svg";
 import { ReactComponent as ManagmentModulesIcon } from "../../../../../../assets/icons/ManagmentModulesIcon.svg";
 import { ReactComponent as ManagmentRolesIcon } from "../../../../../../assets/icons/ManagmentRolesIcon.svg";
+import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/icons/CatalogyPlantsIcon.svg";
+import { ReactComponent as FamilyPlantsIcon } from "../../../../../../assets/icons/FamilyPlantsIcon.svg";
+import { ReactComponent as GenusPlantsIcon } from "../../../../../../assets/icons/GenusPlantsIcon.svg";
+import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/icons/SpeciesPlantsIcon.svg";
 
 const SIDEBAR_WIDTH_OPEN = "w-64";
 const SIDEBAR_WIDTH_CLOSED = "w-16";
@@ -43,13 +46,37 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
 
     const userType = localStorage.getItem("type");
 
-    // Tu array de menuItems existente (sin cambios)
     const menuItems: MenuItem[] = [
         {
             id: "plants",
             icon: <PlantIcon className="w-6 h-6" />,
-            label: "Catálogo de plantas",
-            route: "/catalogo-plantas",
+            label: "Plantas",
+            subItems: [
+                {
+                    id: "plant-catalog",
+                    label: "Catálogo",
+                    icon: <CatalogyPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    route: "/plants/catalog"
+                },
+                {
+                    id: "plant-family",
+                    label: "Familias",
+                    icon: <FamilyPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    route: "/plants/family"
+                },
+                {
+                    id: "plant-genus",
+                    label: "Género",
+                    icon: <GenusPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    route: "/plants/genus"
+                },
+                {
+                    id: "plant-species",
+                    label: "Especies",
+                    icon: <SpeciesPlantsIcon className="w-5 h-5" />,
+                    route: "/plants/species"
+                },
+            ],
         },
         {
             id: "stats",
@@ -172,7 +199,6 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                     </ul>
                 </div>
 
-                {/* ✅ CAMBIADO: ProfileDropdown en lugar de bottomItems */}
                 <div className={`flex flex-col p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
                     <ProfileDropdown user={user} isOpen={open} />
                 </div>

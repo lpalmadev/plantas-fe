@@ -4,7 +4,10 @@ import PrivateRouter from "./routers/PrivateRouter";
 import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import Profile from "../../profile/pages/Profile";
-import CatalogyPlants from "../../plants/pages/PlantPage.tsx";
+import PlantCatalogPage from "../../plants/pages/plant-catalogy/PlantCatalogPage.tsx";
+import PlantFamilyPage from "../../plants/pages/plant-family/PlantFamilyPage.tsx";
+import PlantGenusPage from "../../plants/pages/plant-genus/PlantGenusPage.tsx";
+import SpeciesFamilyPage from "../../plants/pages/plant-species/SpeciesFamilyPage.tsx";
 import UserAdminPage from "../../users/pages/UserPage.tsx";
 import ModulePage from "../../module/pages/ModulePage.tsx";
 import RolePage from "../../roles/pages/RolePage.tsx";
@@ -17,7 +20,10 @@ export default function MainRouter() {
             </Route>
             <Route element={<PrivateRouter />}>
                 <Route path={ROUTES.PROFILE} element={<Profile />} />
-                <Route path={ROUTES.CATALOG_PLANTS} element={<CatalogyPlants />} />
+                <Route path={ROUTES.CATALOG_PLANTS} element={<PlantCatalogPage />} />
+                <Route path={ROUTES.PLANT_FAMILY} element={<PlantFamilyPage />} />
+                <Route path={ROUTES.PLANT_GENUS} element={<PlantGenusPage />} />
+                <Route path={ROUTES.PLANT_SPECIES} element={<SpeciesFamilyPage />} />
                 <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
                 <Route path={ROUTES.MODULES} element={<ModulePage />} />
                 <Route path={ROUTES.USER_ROLE} element={<RolePage />} />

@@ -1,5 +1,5 @@
-import { Button } from "../../../ui/button"; // ✅ CORREGIDO: 3 niveles hacia arriba
-import { useThemeStore } from "../../../../states/themeStore"; // ✅ CORREGIDO
+import { Button } from "../../../ui/button";
+import { useThemeStore } from "../../../../states/themeStore";
 
 interface LogoutConfirmModalProps {
     isOpen: boolean;

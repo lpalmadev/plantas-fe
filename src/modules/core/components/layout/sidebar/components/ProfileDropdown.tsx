@@ -14,7 +14,6 @@ import LogoutConfirmModal from "./LogoutConfirmModal";
 import { ROUTES } from "../../../../router/path";
 import { User } from "../lib/types";
 
-// ✅ SOLO los iconos que SÍ existen y funcionan en tu Sidebar actual
 import { ReactComponent as LogoutIcon } from "../../../../../../assets/icons/LogoutIcon.svg";
 
 interface ProfileDropdownProps {
@@ -85,7 +84,6 @@ const ProfileDropdown = ({ user, isOpen }: ProfileDropdownProps) => {
                     side="right"
                     align="end"
                 >
-                    {/* ✅ Ir a perfil - usando el mismo avatar */}
                     <DropdownMenuItem
                         onClick={handleGoToProfile}
                         className={`${isDark ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100'}`}
@@ -103,14 +101,12 @@ const ProfileDropdown = ({ user, isOpen }: ProfileDropdownProps) => {
 
                     <DropdownMenuSeparator className={isDark ? 'bg-gray-700' : 'bg-gray-200'} />
 
-                    {/* ✅ Toggle tema - usando los iconos SVG de tu ThemeToggle */}
                     <DropdownMenuItem
                         onClick={handleToggleTheme}
                         className={`${isDark ? 'hover:bg-gray-700 text-gray-200' : 'hover:bg-gray-100'}`}
                     >
                         <span className="w-4 h-4 mr-2 flex items-center justify-center">
                             {!isDark ? (
-                                // Icono de luna (para activar modo oscuro)
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                                 </svg>
@@ -126,7 +122,6 @@ const ProfileDropdown = ({ user, isOpen }: ProfileDropdownProps) => {
 
                     <DropdownMenuSeparator className={isDark ? 'bg-gray-700' : 'bg-gray-200'} />
 
-                    {/* ✅ Cerrar sesión - usando el icono que SÍ funciona */}
                     <DropdownMenuItem
                         onClick={handleLogoutClick}
                         className={`${isDark ? 'hover:bg-red-900/20 text-red-400' : 'hover:bg-red-50 text-red-600'}`}
