@@ -1,5 +1,7 @@
 export const ROUTES = {
         LOGIN: "/login",
+        FORGOT_PASSWORD: "/forgot-password",
+        RESET_PASSWORD: "/reset-password",
         PROFILE: "/perfil",
         CATALOG_PLANTS: "/plants/catalog",
         PLANT_FAMILY: "/plants/family",

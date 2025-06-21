@@ -3,6 +3,8 @@ import PublicRouter from "./routers/PublicRouter";
 import PrivateRouter from "./routers/PrivateRouter";
 import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
+import ForgotPasswordPage from "../../auth/pages/ForgotPasswordPage";
+import ResetPasswordPage from "../../auth/pages/ResetPasswordPage";
 import Profile from "../../profile/pages/Profile";
 import PlantCatalogPage from "../../plants/pages/plant-catalogy/PlantCatalogPage.tsx";
 import PlantFamilyPage from "../../plants/pages/plant-family/PlantFamilyPage.tsx";
@@ -17,6 +19,8 @@ export default function MainRouter() {
         <Routes>
             <Route element={<PublicRouter />}>
                 <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+                <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
             </Route>
             <Route element={<PrivateRouter />}>
                 <Route path={ROUTES.PROFILE} element={<Profile />} />

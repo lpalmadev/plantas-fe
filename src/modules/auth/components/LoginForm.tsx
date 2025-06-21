@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "../../core/components/ui/button";
 import { useThemeStore } from "../../core/states/themeStore";
+import { ROUTES } from "../../core/router/path";
 
 interface LoginFormProps {
     onLoginSuccess: () => void;
@@ -66,6 +68,16 @@ export const LoginForm = ({ onLoginSuccess, loading, error, login }: LoginFormPr
                     aria-label="Contraseña"
                 />
             </div>
+
+            <div className="flex justify-end">
+                <Link
+                    to={ROUTES.FORGOT_PASSWORD}
+                    className={`text-sm ${isDark ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-500'} underline`}
+                >
+                    ¿Olvidaste tu contraseña?
+                </Link>
+            </div>
+
             {error && (
                 <div className={`text-red-600 ${isDark ? 'bg-red-900/30' : 'bg-red-100'} rounded px-3 py-2 text-sm`}>
                     {error}

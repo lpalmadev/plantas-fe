@@ -12,3 +12,16 @@ export interface AuthState {
     token: string | null;
     userType: string | null;
 }
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ForgotPasswordResponse {
+    message: string;
+}
+
+export interface ResetPasswordRequest {
+    email: string;
+    code: string;
+    newPassword: string;
+}
