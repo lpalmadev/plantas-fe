@@ -2,8 +2,6 @@ import { Module, CreateModuleDTO } from "../lib/types.ts";
 import { API_ENDPOINTS } from "../../core/lib/enpoints.ts";
 import { getHeaders } from "../../core/utils/UtilsFuntions.ts";
 
-
-
 export const moduleService = {
     getAllModules: async (): Promise<Module[]> => {
         try {
@@ -41,36 +39,24 @@ export const moduleService = {
         }
     },
 
-    activateModule: async (moduleId: string): Promise<void> => {
+    updateModuleStatus: async (moduleId: string, isActive: boolean): Promise<Module> => {
         try {
             const response = await fetch(API_ENDPOINTS.MODULE_BY_ID(moduleId), {
                 method: "PUT",
-                headers: getHeaders()
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    is_active: isActive
+                }),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Error al activar el módulo");
+                throw new Error(errorData.message || "Error al actualizar el estado del módulo");
             }
-        } catch (error) {
-            console.error("Error en activateModule:", error);
-            throw error;
-        }
-    },
 
-    deactivateModule: async (moduleId: string): Promise<void> => {
-        try {
-            const response = await fetch(API_ENDPOINTS.MODULE_BY_ID(moduleId), {
-                method: "PUT",
-                headers: getHeaders()
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Error al desactivar el módulo");
-            }
+            return await response.json();
         } catch (error) {
-            console.error("Error en deactivateModule:", error);
+            console.error("Error en updateModuleStatus:", error);
             throw error;
         }
     },

@@ -37,6 +37,8 @@ export function RoleCreateModal({
 
     const [modulePermissions, setModulePermissions] = useState<Record<string, PermissionType[]>>({});
 
+    const activeModules = modules.filter(module => module.is_active === true);
+
     const updateModulePermissions = (moduleId: string, permission: PermissionType, checked: boolean) => {
         setModulePermissions(prevState => {
             const currentPermissions = [...(prevState[moduleId] || [])];
@@ -174,13 +176,13 @@ export function RoleCreateModal({
                         <div className={`border rounded-lg p-4 ${
                             isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'
                         }`}>
-                            {modules.length === 0 ? (
+                            {activeModules.length === 0 ? (
                                 <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    No hay módulos disponibles
+                                    No hay módulos activos disponibles
                                 </p>
                             ) : (
                                 <div className="grid grid-cols-1 gap-4">
-                                    {modules.map(module => (
+                                    {activeModules.map(module => (
                                         <div key={module.id} className={`border-b pb-3 last:border-b-0 ${
                                             isDark ? 'border-gray-600' : 'border-gray-200'
                                         }`}>
@@ -188,7 +190,7 @@ export function RoleCreateModal({
                                                 {module.name}
                                             </h4>
                                             <div className="flex flex-wrap gap-4">
-                                                {(["READ", "CREATE", "UPDATE", "DELETE"] as PermissionType[]).map(permission => {
+                                                {(["read", "CREATE", "UPDATE", "DELETE"] as PermissionType[]).map(permission => {
                                                     const isChecked = modulePermissions[module.id]?.includes(permission) || false;
                                                     const isReadOnlyDisabled =
                                                         permission === "READ" &&
@@ -224,7 +226,6 @@ export function RoleCreateModal({
                         )}
                     </div>
 
-                    {/* Botones */}
                     <div className="flex justify-end gap-2 mt-6">
                         <Button
                             type="button"

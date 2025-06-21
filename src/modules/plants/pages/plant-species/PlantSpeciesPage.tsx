@@ -3,52 +3,52 @@
 import { useState } from "react";
 import Sidebar from "../../../core/components/layout/sidebar/pages/Sidebar";
 import { DataTable } from "../../../core/components/ui/data-table";
-import { createPlantGenusColumns } from "../../components/plant-genus/PlantGenusColumns";
+import { createPlantSpeciesColumns } from "../../components/plant-species/PlantSpeciesColumns";
 import { Button } from "../../../core/components/ui/button";
-import { PlantGenusCreateModal } from "../../components/plant-genus/PlantGenusCreateModal";
-import { PlantGenus, CreatePlantGenusDTO } from "../../lib/plant-genus/types.ts";
+import { PlantSpeciesCreateModal } from "../../components/plant-species/PlantSpeciesCreateModal";
+import { PlantSpecies, CreatePlantSpeciesDTO } from "../../lib/plant-species/types";
 import { useThemeStore } from "../../../core/states/themeStore";
 
-const mockPlantGenus: PlantGenus[] = [
+const mockPlantSpecies: PlantSpecies[] = [
     {
         id: "1",
-        name: "Rosa",
-        description: "Género de plantas de la familia Rosaceae que incluye diversas especies de rosas",
+        name: "Rosa gallica",
+        description: "Especie de rosa nativa de Europa, conocida como rosa francesa",
         created_date: "2025-01-15T10:30:00Z"
     }
 ];
 
-export default function PlantGenusPage() {
+export default function SpeciesFamilyPage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const [genus, setGenus] = useState<PlantGenus[]>(mockPlantGenus);
+    const [species, setSpecies] = useState<PlantSpecies[]>(mockPlantSpecies);
     const [isLoading] = useState(false);
 
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const handleEdit = (genusId: string) => {
-        console.log("Editar género:", genusId);
+    const handleEdit = (speciesId: string) => {
+        console.log("Editar especie:", speciesId);
     };
 
-    const handleDelete = (genusId: string) => {
-        console.log("Eliminar género:", genusId);
-        setGenus(prev => prev.filter(g => g.id !== genusId));
+    const handleDelete = (speciesId: string) => {
+        console.log("Eliminar especie:", speciesId);
+        setSpecies(prev => prev.filter(s => s.id !== speciesId));
     };
 
-    const handleGenusCreated = async (genusData: CreatePlantGenusDTO) => {
-        console.log("Crear género:", genusData);
+    const handleSpeciesCreated = async (speciesData: CreatePlantSpeciesDTO) => {
+        console.log("Crear especie:", speciesData);
 
-        const newGenus: PlantGenus = {
+        const newSpecies: PlantSpecies = {
             id: Date.now().toString(),
-            ...genusData,
+            ...speciesData,
             created_date: new Date().toISOString()
         };
 
-        setGenus(prev => [...prev, newGenus]);
+        setSpecies(prev => [...prev, newSpecies]);
         setModalOpen(false);
     };
 
-    const columns = createPlantGenusColumns(handleEdit, handleDelete, isDark);
+    const columns = createPlantSpeciesColumns(handleEdit, handleDelete, isDark);
 
     return (
         <div className={`flex h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
@@ -56,7 +56,7 @@ export default function PlantGenusPage() {
             <main className={`flex-1 flex flex-col ${isDark ? 'bg-gray-800' : 'bg-green-50'}`}>
                 <div className="flex justify-center items-center py-8">
                     <h1 className={`text-2xl font-bold ${isDark ? 'text-green-400' : 'text-green-900'}`}>
-                        Género de Plantas
+                        Especies de Plantas
                     </h1>
                 </div>
 
@@ -66,7 +66,7 @@ export default function PlantGenusPage() {
                         onClick={() => setModalOpen(true)}
                         className={isDark ? "bg-green-600 hover:bg-green-700 text-white border-green-600" : ""}
                     >
-                        Crear Género
+                        Crear Especie
                     </Button>
                 </div>
 
@@ -79,16 +79,16 @@ export default function PlantGenusPage() {
                         <div className={`${isDark ? 'text-white' : ''}`}>
                             <DataTable
                                 columns={columns}
-                                data={genus}
+                                data={species}
                             />
                         </div>
                     )}
                 </div>
 
-                <PlantGenusCreateModal
+                <PlantSpeciesCreateModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    onSubmitSuccess={handleGenusCreated}
+                    onSubmitSuccess={handleSpeciesCreated}
                     isDark={isDark}
                 />
             </main>

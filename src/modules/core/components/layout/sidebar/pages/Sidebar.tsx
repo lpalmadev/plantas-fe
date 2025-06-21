@@ -55,19 +55,19 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                 {
                     id: "plant-catalog",
                     label: "Catálogo",
-                    icon: <CatalogyPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    icon: <CatalogyPlantsIcon className="w-5 h-5" />,
                     route: "/plants/catalog"
                 },
                 {
                     id: "plant-family",
                     label: "Familias",
-                    icon: <FamilyPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    icon: <FamilyPlantsIcon className="w-5 h-5" />,
                     route: "/plants/family"
                 },
                 {
                     id: "plant-genus",
                     label: "Género",
-                    icon: <GenusPlantsIcon className="w-5 h-5" />, // 🌱 Placeholder - reemplaza con tu icono
+                    icon: <GenusPlantsIcon className="w-5 h-5" />,
                     route: "/plants/genus"
                 },
                 {

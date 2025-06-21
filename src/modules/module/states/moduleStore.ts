@@ -11,7 +11,6 @@ interface ModuleState {
     createError: Error | null;
     toggleError: Error | null;
 
-    // Acciones
     fetchModules: () => Promise<void>;
     createModule: (data: CreateModuleDTO) => Promise<void>;
     toggleModuleStatus: (moduleId: string, activate: boolean) => Promise<void>;
@@ -59,18 +58,11 @@ export const useModuleStore = create<ModuleState>((set, get) => ({
     toggleModuleStatus: async (moduleId: string, activate: boolean) => {
         set({ toggling: true, toggleError: null });
         try {
-            if (activate) {
-                await moduleService.activateModule(moduleId);
-            } else {
-                await moduleService.deactivateModule(moduleId);
-            }
+            const updatedModule = await moduleService.updateModuleStatus(moduleId, activate);
 
-            // Actualizar el estado local después de la llamada a la API
             set(state => ({
                 modules: state.modules.map(module =>
-                    module.id === moduleId
-                        ? { ...module, is_active: activate }
-                        : module
+                    module.id === moduleId ? updatedModule : module
                 ),
                 toggling: false
             }));
