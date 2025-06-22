@@ -1,13 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { LoginResponse } from '../../auth/lib/types.ts';
-import { setAuthToken, setUserType, removetoken, removetype, getAuthToken, getUserType } from '../utils/UtilsFuntions.ts';
+import type { LoginResponse, User, AuthState } from '../../auth/lib/types.ts';
+import { setAuthToken, removetoken } from '../utils/UtilsFuntions.ts';
 
-interface AuthState {
-    isAuthenticated: boolean;
-    token: string | null;
-    userType: string | null;
-
+interface AuthStoreState extends AuthState {
     setAuthState: (data: LoginResponse) => void;
     clearAuth: () => void;
     validateToken: () => void;
@@ -25,38 +21,39 @@ const isTokenValid = (token: string): boolean => {
     }
 };
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<AuthStoreState>()(
     persist(
         (set, get) => ({
             isAuthenticated: false,
             token: null,
             userType: null,
+            user: null,
 
             setAuthState: (data: LoginResponse) => {
-                if (data.token) {
+                if (data.token && data.user) {
                     setAuthToken(data.token);
-                    if (data.user?.type) setUserType(data.user.type);
 
                     set({
                         isAuthenticated: true,
                         token: data.token,
-                        userType: data.user?.type || null
+                        userType: data.user.type,
+                        user: data.user
                     });
                 }
             },
 
             clearAuth: () => {
                 removetoken();
-                removetype();
                 set({
                     isAuthenticated: false,
                     token: null,
-                    userType: null
+                    userType: null,
+                    user: null
                 });
             },
 
             validateToken: () => {
-                const currentToken = get().token || getAuthToken();
+                const currentToken = get().token;
 
                 if (!currentToken) {
                     get().clearAuth();
@@ -67,25 +64,17 @@ export const useAuthStore = create<AuthState>()(
                     get().clearAuth();
                     return;
                 }
-
-                if (!get().isAuthenticated) {
-                    set({
-                        isAuthenticated: true,
-                        token: currentToken,
-                        userType: getUserType()
-                    });
-                }
             },
 
             initializeAuth: () => {
-                const token = getAuthToken();
-                const userType = getUserType();
+                const { token, user } = get();
 
-                if (token && isTokenValid(token)) {
+                if (token && user && isTokenValid(token)) {
                     set({
                         isAuthenticated: true,
                         token,
-                        userType
+                        userType: user.type,
+                        user
                     });
                 } else {
                     get().clearAuth();

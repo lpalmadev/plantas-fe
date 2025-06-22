@@ -17,9 +17,6 @@ export const useLoginMutation = () => {
             setAuthState(data);
             return data;
         },
-        onSuccess: (data) => {
-            console.log('Login exitoso:', data.user.email);
-        },
         onError: (error) => {
             console.error('Error en login:', error.message);
         }

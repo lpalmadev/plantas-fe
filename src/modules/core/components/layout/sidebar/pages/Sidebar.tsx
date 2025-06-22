@@ -2,12 +2,13 @@ import { useLocation } from "react-router-dom";
 
 import { useSidebarState } from "../hooks/useSidebarState.tsx";
 import { useThemeStore } from "../../../../states/themeStore";
+import { useAuthStore } from "../../../../states/authStore";
 import SidebarToggle from "../components/SidebarToggle.tsx";
 import SidebarItem from "../components/SidebarItem.tsx";
 import SidebarSubItem from "../components/SidebarSubItem.tsx";
 import ProfileDropdown from "../components/ProfileDropdown.tsx";
 
-import { MenuItem, SidebarProps, User } from "../lib/types.ts";
+import { MenuItem, SidebarProps } from "../lib/types.ts";
 
 import { ReactComponent as StatsIcon } from "../../../../../../assets/icons/StatsIcon.svg";
 import { ReactComponent as PlantIcon } from "../../../../../../assets/icons/PlantIcon.svg";
@@ -29,14 +30,9 @@ import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/ic
 const SIDEBAR_WIDTH_OPEN = "w-64";
 const SIDEBAR_WIDTH_CLOSED = "w-16";
 
-const mockUser: User = {
-    name: "Deisy",
-    avatarUrl: "https://th.bing.com/th/id/R.af7b7bc053ca27c87f7c18fde9448467?rik=I9OjMbLUKMfQow&riu=http%3a%2f%2fimages7.memedroid.com%2fimages%2fUPLOADED852%2f6333a0372d364.jpeg&ehk=ujVn4U%2bHAJqhAmQYOjpyoIjqrzjkI6b%2fZg11xnqNzqo%3d&risl=&pid=ImgRaw&r=0",
-};
-
 const scrollbarHideClass = "scrollbar-none";
 
-const Sidebar = ({ user = mockUser }: SidebarProps) => {
+const Sidebar = ({ user }: SidebarProps) => {
     const { open, getSubmenuState, toggleSidebar, toggleSubmenu } = useSidebarState();
     const location = useLocation();
     const pathname = location.pathname;
@@ -44,7 +40,14 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const userType = localStorage.getItem("type");
+    const { user: authUser, userType } = useAuthStore();
+
+    const currentUser = {
+        name: user?.name || authUser?.name || "Usuario",
+        avatarUrl: user?.avatarUrl || authUser?.picture || "https://th.bing.com/th/id/R.af7b7bc053ca27c87f7c18fde9448467?rik=I9OjMbLUKMfQow&riu=http%3a%2f%2fimages7.memedroid.com%2fimages%2fUPLOADED852%2f6333a0372d364.jpeg&ehk=ujVn4U%2bHAJqhAmQYOjpyoIjqrzjkI6b%2fZg11xnqNzqo%3d&risl=&pid=ImgRaw&r=0",
+    };
+
+    const userTypeFromStore = userType || "user";
 
     const menuItems: MenuItem[] = [
         {
@@ -89,7 +92,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
             label: "Gestión de usuarios",
             subItems: [
                 { id: "user-general", label: "General", icon: <UserGeneralIcon className="w-5 h-5" /> },
-                ...(userType === "superadmin"
+                ...(userTypeFromStore === "superadmin"
                     ? [
                         {
                             id: "user-admin",
@@ -101,7 +104,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                     : []),
             ],
         },
-        ...(userType === "superadmin"
+        ...(userTypeFromStore === "superadmin"
                 ? [
                     {
                         id: "modules",
@@ -112,7 +115,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                 ]
                 : []
         ),
-        ...(userType === "superadmin"
+        ...(userTypeFromStore === "superadmin"
                 ? [
                     {
                         id: "roles",
@@ -200,7 +203,7 @@ const Sidebar = ({ user = mockUser }: SidebarProps) => {
                 </div>
 
                 <div className={`flex flex-col p-3 border-t ${isDark ? 'border-green-700/60' : 'border-green-500/40'}`}>
-                    <ProfileDropdown user={user} isOpen={open} />
+                    <ProfileDropdown user={currentUser} isOpen={open} />
                 </div>
             </nav>
         </>

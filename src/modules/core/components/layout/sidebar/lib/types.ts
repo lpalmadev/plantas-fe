@@ -2,7 +2,11 @@ import { ReactNode } from 'react';
 
 export interface User {
     name: string;
-    avatarUrl: string;
+    avatarUrl?: string;
+    picture?: string;
+    email?: string;
+    type?: string;
+    sub?: string;
 }
 
 export interface SubMenuItem {
