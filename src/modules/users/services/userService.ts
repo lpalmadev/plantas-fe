@@ -8,8 +8,15 @@ export const userService = {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los usuarios");
-        const result = await response.json();
-        return result.admins || [];
+        const json = await response.json();
+
+        if (Array.isArray(json)) {
+            return json;
+        } else if (Array.isArray(json.data)) {
+            return json.data;
+        } else {
+            return [];
+        }
     },
 
     createUser: async (userData: CreateUserDTO): Promise<User> => {

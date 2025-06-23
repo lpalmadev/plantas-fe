@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../../core/components/ui/button";
-import { PlantFamily } from "../../lib/plant-family/types.ts";
+import { PlantFamily } from "../../lib/plant-family/types";
 import * as React from "react";
 
 interface ActionsCellProps {

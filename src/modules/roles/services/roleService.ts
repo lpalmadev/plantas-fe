@@ -9,8 +9,15 @@ export const roleService = {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los roles");
-        const result = await response.json();
-        return result.data.roles;
+        const json = await response.json();
+
+        if (Array.isArray(json)) {
+            return json;
+        } else if (Array.isArray(json.data.data)) {
+            return json.data.data;
+        } else {
+            return [];
+        }
     },
 
     createRole: async (roleData: CreateRoleDTO): Promise<Role> => {
@@ -31,6 +38,14 @@ export const roleService = {
             headers: getHeaders()
         });
         if (!response.ok) throw new Error("Error al obtener los módulos");
-        return await response.json();
+        const json = await response.json();
+
+        if (Array.isArray(json)) {
+            return json;
+        } else if (Array.isArray(json.data)) {
+            return json.data;
+        } else {
+            return [];
+        }
     },
 };

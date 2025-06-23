@@ -37,7 +37,7 @@ export function RoleCreateModal({
 
     const [modulePermissions, setModulePermissions] = useState<Record<string, PermissionType[]>>({});
 
-    const activeModules = modules.filter(module => module.is_active === true);
+    const activeModules = Array.isArray(modules) ? modules.filter(module => module.is_active === true) : [];
 
     const updateModulePermissions = (moduleId: string, permission: PermissionType, checked: boolean) => {
         setModulePermissions(prevState => {

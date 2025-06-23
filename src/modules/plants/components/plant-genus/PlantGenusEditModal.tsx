@@ -1,43 +1,54 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { CreatePlantFamilyDTO } from "../../lib/plant-family/types";
+import { UpdatePlantGenusDTO, PlantGenus } from "../../lib/plant-genus/types.ts";
 
-interface PlantFamilyCreateModalProps {
+interface PlantGenusEditModalProps {
     open: boolean;
     onClose: () => void;
-    onSubmitSuccess?: (data: CreatePlantFamilyDTO) => void;
+    onSubmitSuccess?: (id: string, data: UpdatePlantGenusDTO) => void;
+    genus: PlantGenus | null;
     isDark?: boolean;
 }
 
-export function PlantFamilyCreateModal({
-                                           open,
-                                           onClose,
-                                           onSubmitSuccess,
-                                           isDark = false,
-                                       }: PlantFamilyCreateModalProps) {
+export function PlantGenusEditModal({
+                                        open,
+                                        onClose,
+                                        onSubmitSuccess,
+                                        genus,
+                                        isDark = false
+                                    }: PlantGenusEditModalProps) {
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors, isSubmitting },
-    } = useForm<CreatePlantFamilyDTO>();
+    } = useForm<UpdatePlantGenusDTO>();
 
-    const onSubmit = async (data: CreatePlantFamilyDTO) => {
-        if (onSubmitSuccess) {
-            await onSubmitSuccess(data);
-            reset();
+    useEffect(() => {
+        if (genus) {
+            reset({
+                name: genus.name,
+                description: genus.description
+            });
+        }
+    }, [genus, reset]);
+
+    const onSubmit = async (data: UpdatePlantGenusDTO) => {
+        if (onSubmitSuccess && genus) {
+            await onSubmitSuccess(genus.id, data);
             onClose();
         }
     };
 
-    if (!open) return null;
+    if (!open || !genus) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
             <div className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'} rounded-2xl shadow-2xl w-full max-w-md p-4 relative`}>
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Crear nueva familia</h2>
+                    <h2 className="text-xl font-bold">Editar género</h2>
                     <button
                         className={`${isDark ? 'text-gray-300 hover:text-red-400' : 'text-gray-400 hover:text-red-500'} text-xl transition-colors`}
                         onClick={() => {
@@ -120,7 +131,7 @@ export function PlantFamilyCreateModal({
                             } text-white font-semibold transition`}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Creando..." : "Crear"}
+                            {isSubmitting ? "Guardando..." : "Guardar cambios"}
                         </button>
                     </div>
                 </form>

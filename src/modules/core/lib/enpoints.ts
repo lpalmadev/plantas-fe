@@ -6,4 +6,10 @@ export const API_ENDPOINTS = {
     MODULE: "https://jardindeploy.onrender.com/modules",
     MODULE_BY_ID: (id: string) => `https://jardindeploy.onrender.com/modules/${id}`,
     ADMIN_USERS: "https://jardindeploy.onrender.com/admin/users",
+    PLANT_FAMILIES: "https://jardindeploy.onrender.com/plant-families",
+    PLANT_FAMILY_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-families/${id}`,
+    PLANT_GENUS_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-genera/${id}`,
+    PLANT_GENERA: `https://jardindeploy.onrender.com/plant-genera`,
+    PLANT_SPECIES_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-species/${id}`,
+    PLANT_SPECIES: `https://jardindeploy.onrender.com/plant-species`,
 };

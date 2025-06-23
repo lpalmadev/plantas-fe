@@ -12,7 +12,15 @@ export const moduleService = {
             if (!response.ok) {
                 throw new Error("Error al obtener los módulos");
             }
-            return await response.json();
+            const json = await response.json();
+
+            if (Array.isArray(json)) {
+                return json;
+            } else if (Array.isArray(json.data)) {
+                return json.data;
+            } else {
+                return [];
+            }
         } catch (error) {
             console.error("Error en getAllModules:", error);
             throw error;

@@ -1,43 +1,54 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { CreatePlantFamilyDTO } from "../../lib/plant-family/types";
+import { UpdatePlantFamilyDTO, PlantFamily } from "../../lib/plant-family/types";
 
-interface PlantFamilyCreateModalProps {
+interface PlantFamilyEditModalProps {
     open: boolean;
     onClose: () => void;
-    onSubmitSuccess?: (data: CreatePlantFamilyDTO) => void;
+    onSubmitSuccess?: (id: string, data: UpdatePlantFamilyDTO) => void;
+    family: PlantFamily | null;
     isDark?: boolean;
 }
 
-export function PlantFamilyCreateModal({
-                                           open,
-                                           onClose,
-                                           onSubmitSuccess,
-                                           isDark = false,
-                                       }: PlantFamilyCreateModalProps) {
+export function PlantFamilyEditModal({
+                                         open,
+                                         onClose,
+                                         onSubmitSuccess,
+                                         family,
+                                         isDark = false
+                                     }: PlantFamilyEditModalProps) {
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors, isSubmitting },
-    } = useForm<CreatePlantFamilyDTO>();
+    } = useForm<UpdatePlantFamilyDTO>();
 
-    const onSubmit = async (data: CreatePlantFamilyDTO) => {
-        if (onSubmitSuccess) {
-            await onSubmitSuccess(data);
-            reset();
+    useEffect(() => {
+        if (family) {
+            reset({
+                name: family.name,
+                description: family.description
+            });
+        }
+    }, [family, reset]);
+
+    const onSubmit = async (data: UpdatePlantFamilyDTO) => {
+        if (onSubmitSuccess && family) {
+            await onSubmitSuccess(family.id, data);
             onClose();
         }
     };
 
-    if (!open) return null;
+    if (!open || !family) return null;
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
             <div className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'} rounded-2xl shadow-2xl w-full max-w-md p-4 relative`}>
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Crear nueva familia</h2>
+                    <h2 className="text-xl font-bold">Editar familia</h2>
                     <button
                         className={`${isDark ? 'text-gray-300 hover:text-red-400' : 'text-gray-400 hover:text-red-500'} text-xl transition-colors`}
                         onClick={() => {
@@ -120,7 +131,7 @@ export function PlantFamilyCreateModal({
                             } text-white font-semibold transition`}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Creando..." : "Crear"}
+                            {isSubmitting ? "Guardando..." : "Guardar cambios"}
                         </button>
                     </div>
                 </form>
