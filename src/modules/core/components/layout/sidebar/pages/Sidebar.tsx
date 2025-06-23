@@ -44,7 +44,7 @@ const Sidebar = ({ user }: SidebarProps) => {
 
     const currentUser = {
         name: user?.name || authUser?.name || "Usuario",
-        avatarUrl: user?.avatarUrl || authUser?.picture || "https://th.bing.com/th/id/R.af7b7bc053ca27c87f7c18fde9448467?rik=I9OjMbLUKMfQow&riu=http%3a%2f%2fimages7.memedroid.com%2fimages%2fUPLOADED852%2f6333a0372d364.jpeg&ehk=ujVn4U%2bHAJqhAmQYOjpyoIjqrzjkI6b%2fZg11xnqNzqo%3d&risl=&pid=ImgRaw&r=0",
+        avatarUrl: user?.avatarUrl || authUser?.picture || "https://static.vecteezy.com/system/resources/previews/005/129/844/non_2x/profile-user-icon-isolated-on-white-background-eps10-free-vector.jpg",
     };
 
     const userTypeFromStore = userType || "user";

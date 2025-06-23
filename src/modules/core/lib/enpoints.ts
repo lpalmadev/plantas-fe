@@ -12,4 +12,9 @@ export const API_ENDPOINTS = {
     PLANT_GENERA: `https://jardindeploy.onrender.com/plant-genera`,
     PLANT_SPECIES_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-species/${id}`,
     PLANT_SPECIES: `https://jardindeploy.onrender.com/plant-species`,
+    CATALOG_PLANTS: "https://jardindeploy.onrender.com/catalog-plants",
+    CATALOG_PLANT_BY_ID: (id: string) => `https://jardindeploy.onrender.com/catalog-plants/${id}`,
+    PLANT_IMAGES_UPLOAD: "https://jardindeploy.onrender.com/plant-images/upload",
+    PLANT_IMAGES_LINK: "https://jardindeploy.onrender.com/plant-images/link",
+    PLANT_IMAGES_BY_ID: (id: string) => `https://jardindeploy.onrender.com/plant-images/${id}`,
 };

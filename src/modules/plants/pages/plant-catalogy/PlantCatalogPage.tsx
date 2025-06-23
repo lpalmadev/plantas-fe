@@ -1,130 +1,105 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../../core/components/layout/sidebar/pages/Sidebar";
 import { Button } from "../../../core/components/ui/button";
-import { Input } from "../../../core/components/ui/input";
-import { PlantCatalogCreateModal } from "../../components/plant-catalogy/PlantCatalogCreateModal";
+import { PlantCatalogFilters } from "../../components/plant-catalogy/PlantCatalogFilters";
+import { PlantFormModal } from "../../components/plant-catalogy/PlantCatalogFormModal";
 import { PlantCard } from "../../components/plant-catalogy/PlantCard";
 import { PlantDetailModal } from "../../components/plant-catalogy/PlantDetailModal";
+import { DeleteConfirmationModal } from "../../components/plant-catalogy/DeleteConfirmationModal";
+import { Pagination } from "../../components/plant-catalogy/Pagination";
+import { usePlantCatalog } from "../../hooks/plant-catalogy/usePlantCatalog";
 import { useThemeStore } from "../../../core/states/themeStore";
 
-interface Plant {
-    id: string;
-    name: string;
-    scientificName: string;
-    type: string;
-    tempMin: number;
-    tempMax: number;
-    humidityLevel: string;
-    family: string;
-    genus: string;
-    species: string;
-    image: string;
-    description?: string;
-    alerts?: string;
-}
-
-const mockPlants: Plant[] = [
-    {
-        id: "1",
-        name: "Tomate de rama",
-        scientificName: "Solanum lycopersicum",
-        type: "Hortalizas y leguminosas",
-        tempMin: 22,
-        tempMax: 28,
-        humidityLevel: "Medium_high",
-        family: "Solanaceae",
-        genus: "Solanum",
-        species: "S. lycopersicum",
-        image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&h=300&fit=crop",
-        description: "El tomate es una planta herbácea de la familia de las solanáceas, muy cultivada por sus frutos comestibles.",
-        alerts: "Susceptible a plagas como la mosca blanca y el pulgón."
-    },
-    {
-        id: "2",
-        name: "Rosa roja",
-        scientificName: "Rosa gallica",
-        type: "Plantas ornamentales",
-        tempMin: 15,
-        tempMax: 25,
-        humidityLevel: "Medium",
-        family: "Rosaceae",
-        genus: "Rosa",
-        species: "R. gallica",
-        image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=300&fit=crop",
-        description: "Rosa ornamental de color rojo intenso, muy apreciada por su fragancia.",
-    },
-    {
-        id: "3",
-        name: "Albahaca",
-        scientificName: "Ocimum basilicum",
-        type: "Hierbas aromáticas",
-        tempMin: 20,
-        tempMax: 30,
-        humidityLevel: "Medium",
-        family: "Lamiaceae",
-        genus: "Ocimum",
-        species: "O. basilicum",
-        image: "https://images.unsplash.com/photo-1618164435735-413d3b066c9a?w=400&h=300&fit=crop",
-        description: "Hierba aromática muy utilizada en la cocina mediterránea e italiana.",
-    }
-];
-
 export default function PlantCatalogPage() {
-    const [modalOpen, setModalOpen] = useState(false);
-    const [detailModalOpen, setDetailModalOpen] = useState(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedFilter, setSelectedFilter] = useState("Todas las categorías");
+    const [detailModalOpen, setDetailModalOpen] = useState(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const mockFilters = [
+    const {
+        plants,
+        selectedPlant,
+        isLoading,
+        isLoadingDetail,
+        error,
+        creating,
+        updating,
+        deleting,
+        uploading,
+        totalItems,
+        totalPages,
+        filters,
+        plantFamilies,
+        plantGenera,
+        plantSpecies,
+        uploadedImageUrls,
+        fetchPlants,
+        fetchPlantById,
+        createPlant,
+        updatePlant,
+        deletePlant,
+        uploadImages,
+        handleSearch,
+        handlePageChange,
+        handleTypeChange,
+        handleSortByChange,
+        handleSortOrderChange,
+        resetUploadedImages
+    } = usePlantCatalog();
+
+    const plantTypes = [
         "Todas las categorías",
+        "Ornamental",
         "Hortalizas y leguminosas",
-        "Plantas ornamentales",
         "Árboles frutales",
-        "Hierbas aromáticas"
+        "Hierbas aromáticas",
+        "Suculentas",
+        "Acuáticas",
+        "Trepadoras"
     ];
 
-    const handleSearch = () => {
-        console.log("Buscar:", searchTerm);
-    };
-
-    const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedFilter(event.target.value);
-        console.log("Filtro seleccionado:", event.target.value);
-    };
-
     const handleAddPlant = () => {
-        setModalOpen(true);
+        resetUploadedImages();
+        setCreateModalOpen(true);
     };
 
-    const handleViewDetail = (plant: Plant) => {
-        setSelectedPlant(plant);
+    const handleViewDetail = (plantId: string) => {
+        fetchPlantById(plantId);
         setDetailModalOpen(true);
     };
 
-    const handleEdit = (plant: Plant) => {
-        setSelectedPlant(plant);
+    const handleEdit = (plantId: string) => {
+        fetchPlantById(plantId);
         setEditModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setModalOpen(false);
+    const handleDelete = (plantId: string) => {
+        fetchPlantById(plantId);
+        setDeleteModalOpen(true);
     };
 
-    const handleCloseDetailModal = () => {
-        setDetailModalOpen(false);
-        setSelectedPlant(null);
+    const handleCreateSubmit = async (data: any) => {
+        await createPlant(data);
+        setCreateModalOpen(false);
     };
 
-    const handleCloseEditModal = () => {
-        setEditModalOpen(false);
-        setSelectedPlant(null);
+    const handleUpdateSubmit = async (data: any) => {
+        if (selectedPlant) {
+            await updatePlant(selectedPlant.id, data);
+            setEditModalOpen(false);
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        if (selectedPlant) {
+            await deletePlant(selectedPlant.id);
+            setDeleteModalOpen(false);
+        }
     };
 
     return (
@@ -137,66 +112,17 @@ export default function PlantCatalogPage() {
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-4 px-8 mb-6">
-                    <div className="flex-1 max-w-lg relative">
-                        <Input
-                            type="text"
-                            placeholder="Buscar..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                            className="pr-10"
-                        />
-                        <button
-                            onClick={handleSearch}
-                            className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors ${
-                                isDark
-                                    ? 'text-gray-400 hover:text-gray-200'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                            aria-label="Buscar"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div className="relative">
-                        <select
-                            value={selectedFilter}
-                            onChange={handleFilterChange}
-                            className={`appearance-none h-9 px-3 py-1 pr-8 rounded-md border text-base shadow-xs transition-colors outline-none focus:ring-2 focus:ring-green-500 ${
-                                isDark
-                                    ? 'bg-gray-700 border-gray-600 text-white'
-                                    : 'bg-white border-gray-300 text-gray-700'
-                            }`}
-                            style={{
-                                backgroundColor: isDark ? 'rgb(55, 65, 81)' : 'white',
-                                color: isDark ? 'white' : 'rgb(55, 65, 81)'
-                            }}
-                        >
-                            {mockFilters.map((filter, index) => (
-                                <option
-                                    key={index}
-                                    value={filter}
-                                    style={{
-                                        backgroundColor: isDark ? 'rgb(55, 65, 81)' : 'white',
-                                        color: isDark ? 'white' : 'rgb(55, 65, 81)'
-                                    }}
-                                >
-                                    {filter}
-                                </option>
-                            ))}
-                        </select>
-                        <div className={`absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none ${
-                            isDark ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
+                <div className="flex items-center justify-between gap-4 px-8 mb-6">
+                    <PlantCatalogFilters
+                        onSearch={handleSearch}
+                        onTypeChange={handleTypeChange}
+                        onSortByChange={handleSortByChange}
+                        onSortOrderChange={handleSortOrderChange}
+                        selectedType={filters.planttype || "Todas las categorías"}
+                        plantTypes={plantTypes}sortBy={filters.sortBy || "name"}           //aqui
+                        sortOrder={filters.sortOrder || "asc"}
+                        isDark={isDark}
+                    />
 
                     <Button
                         onClick={handleAddPlant}
@@ -210,48 +136,108 @@ export default function PlantCatalogPage() {
                     </Button>
                 </div>
 
-                <div className="px-8 flex-1 overflow-y-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
-                        {mockPlants.map((plant) => (
-                            <PlantCard
-                                key={plant.id}
-                                plant={plant}
-                                onViewDetail={handleViewDetail}
-                                onEdit={handleEdit}
+                <div className="px-8 flex-1 overflow-y-auto scrollbar-none">
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Cargando plantas...
+                            </p>
+                        </div>
+                    ) : error ? (
+                        <div className="flex justify-center items-center h-64">
+                            <p className="text-red-500 text-lg">{error}</p>
+                        </div>
+                    ) : plants.length === 0 ? (
+                        <div className="flex justify-center items-center h-64">
+                            <p className={`text-lg ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                No se encontraron plantas
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+                                {plants.map((plant) => (
+                                    <PlantCard
+                                        key={plant.id}
+                                        plant={plant}
+                                        onViewDetail={handleViewDetail}
+                                        onEdit={handleEdit}
+                                        onDelete={handleDelete}
+                                        isDark={isDark}
+                                    />
+                                ))}
+                            </div>
+
+                            <Pagination
+                                currentPage={filters.page}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
                                 isDark={isDark}
                             />
-                        ))}
-                    </div>
+                        </>
+                    )}
                 </div>
+                <style jsx>{`
+                    .scrollbar-none::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .scrollbar-none {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                `}</style>
 
-                <PlantCatalogCreateModal
-                    open={modalOpen}
-                    onClose={handleCloseModal}
+                <PlantFormModal
+                    open={createModalOpen}
+                    onClose={() => setCreateModalOpen(false)}
+                    onSubmit={handleCreateSubmit}
+                    isSubmitting={creating}
+                    uploadImages={uploadImages}
+                    isUploading={uploading}
+                    uploadedUrls={uploadedImageUrls}
+                    resetUploadedImages={resetUploadedImages}
+                    families={plantFamilies}
+                    genera={plantGenera}
+                    species={plantSpecies}
+                    isDark={isDark}
+                />
+
+                <PlantFormModal
+                    open={editModalOpen}
+                    onClose={() => setEditModalOpen(false)}
+                    onSubmit={handleUpdateSubmit}
+                    isSubmitting={updating}
+                    uploadImages={uploadImages}
+                    isUploading={uploading}
+                    uploadedUrls={uploadedImageUrls}
+                    resetUploadedImages={resetUploadedImages}
+                    plant={selectedPlant}
+                    families={plantFamilies}
+                    genera={plantGenera}
+                    species={plantSpecies}
+                    isEdit={true}
                     isDark={isDark}
                 />
 
                 <PlantDetailModal
                     plant={selectedPlant}
                     open={detailModalOpen}
-                    onClose={handleCloseDetailModal}
+                    onClose={() => setDetailModalOpen(false)}
+                    families={plantFamilies}
+                    genera={plantGenera}
+                    species={plantSpecies}
                     isDark={isDark}
                 />
 
-                {editModalOpen && (
-                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                        <div className={`max-w-md w-full rounded-lg p-6 ${
-                            isDark ? 'bg-gray-800 text-white' : 'bg-white text-black'
-                        }`}>
-                            <h3 className="text-lg font-semibold mb-4">Editar Planta</h3>
-                            <p className="text-sm mb-6">Modal de edición - Por implementar con datos pre-cargados</p>
-                            <div className="flex justify-end">
-                                <Button onClick={handleCloseEditModal}>
-                                    Cerrar
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <DeleteConfirmationModal
+                    open={deleteModalOpen}
+                    title="Eliminar Planta"
+                    message={`¿Estás seguro de que deseas eliminar la planta "${selectedPlant?.name}"? Esta acción no se puede deshacer.`}
+                    onCancel={() => setDeleteModalOpen(false)}
+                    onConfirm={handleConfirmDelete}
+                    isDeleting={deleting}
+                    isDark={isDark}
+                />
             </main>
         </div>
     );

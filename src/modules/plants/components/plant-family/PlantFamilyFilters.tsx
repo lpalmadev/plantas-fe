@@ -71,7 +71,7 @@ export function PlantFamilyFilters({
                     }`}
                 >
                     <option value="name">Nombre</option>
-                    <option value="createdAt">Fecha de creación</option>
+                    <option value="created_at">Fecha de creación</option>
                 </select>
                 <Button
                     onClick={handleSortOrderChange}

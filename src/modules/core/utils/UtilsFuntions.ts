@@ -26,6 +26,12 @@ export const getHeaders = () => {
     };
 };
 
+export const getheadersima = () => {
+    return {
+        'Authorization': `Bearer ${getAuthToken()}`
+    };
+};
+
 export  const removetoken = () => {
 
 }

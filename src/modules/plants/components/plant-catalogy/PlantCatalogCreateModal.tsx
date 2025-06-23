@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../../../core/components/ui/button";
 import { Input } from "../../../core/components/ui/input";
+import { ImageUploadSection } from "./ImageUploadSection";
+import { usePlantCatalog } from "../../hooks/plant-catalogy/usePlantCatalog";
 
 interface PlantCatalogCreateModalProps {
     open: boolean;
@@ -18,8 +20,55 @@ export function PlantCatalogCreateModal({
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [plantType, setPlantType] = useState("Ornamental");
+    const [minTemp, setMinTemp] = useState(20);
+    const [maxTemp, setMaxTemp] = useState(30);
+    const [humidityLevel, setHumidityLevel] = useState("MEDIUM");
+    const [warnings, setWarnings] = useState("");
+    const [familyId, setFamilyId] = useState("");
+    const [genusId, setGenusId] = useState("");
+    const [speciesId, setSpeciesId] = useState("");
+
+    const {
+        plantFamilies,
+        plantGenera,
+        plantSpecies,
+        uploadedImageUrls,
+        uploadImages,
+        creating,
+        uploading,
+        createPlant,
+        resetUploadedImages,
+        loadFamilies,
+        loadGenera,
+        loadSpecies
+    } = usePlantCatalog();
+
+    useEffect(() => {
+        if (open) {
+            loadFamilies();
+            loadGenera();
+            loadSpecies();
+            resetUploadedImages();
+        }
+    }, [open, loadFamilies, loadGenera, loadSpecies, resetUploadedImages]);
+
+    useEffect(() => {
+        return () => {
+            resetUploadedImages();
+        };
+    }, [resetUploadedImages]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (uploadedImageUrls.length === 0) {
+            alert("Debe cargar al menos una imagen");
+            return;
+        }
+
         setShowSubmitConfirm(true);
     };
 
@@ -29,14 +78,66 @@ export function PlantCatalogCreateModal({
 
     const confirmCancel = () => {
         setShowCancelConfirm(false);
+        resetForm();
         onClose();
     };
 
-    const confirmSubmit = () => {
+    const confirmSubmit = async () => {
         setShowSubmitConfirm(false);
-        console.log("Planta agregada - MAQUETADO");
-        onClose();
+
+        try {
+            await createPlant({
+                name,
+                description,
+                planttype: plantType,
+                mintemp: minTemp,
+                maxtemp: maxTemp,
+                humiditylevel: humidityLevel,
+                WARNINGS: warnings,
+                familyId,
+                genusId,
+                speciesId,
+                imageUrls: uploadedImageUrls
+            });
+
+            resetForm();
+            onClose();
+        } catch (error) {
+            console.error("Error al crear planta:", error);
+        }
     };
+
+    const resetForm = () => {
+        setName("");
+        setDescription("");
+        setPlantType("Ornamental");
+        setMinTemp(20);
+        setMaxTemp(30);
+        setHumidityLevel("MEDIUM");
+        setWarnings("");
+        setFamilyId("");
+        setGenusId("");
+        setSpeciesId("");
+        resetUploadedImages();
+    };
+
+    const PLANT_TYPES = [
+        "Ornamental",
+        "Hortalizas y leguminosas",
+        "Árboles frutales",
+        "Hierbas aromáticas",
+        "Suculentas",
+        "Acuáticas",
+        "Trepadoras"
+    ];
+
+    const HUMIDITY_LEVELS = [
+        { value: "LOW", label: "Nivel bajo (20% - 30%)" },
+        { value: "LOW_MEDIUM", label: "Nivel bajo-medio (30% - 40%)" },
+        { value: "MEDIUM", label: "Nivel medio (40% - 50%)" },
+        { value: "MEDIUM_HIGH", label: "Nivel medio-alto (50% - 60%)" },
+        { value: "HIGH", label: "Nivel alto (60% - 70%)" }
+    ];
 
     if (!open) return null;
 
@@ -53,6 +154,7 @@ export function PlantCatalogCreateModal({
                             <button
                                 onClick={handleCancel}
                                 className="text-gray-400 hover:text-gray-600 text-2xl"
+                                disabled={creating || uploading}
                             >
                                 ×
                             </button>
@@ -60,20 +162,13 @@ export function PlantCatalogCreateModal({
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                        <div>
-                            <h3 className="text-lg font-semibold mb-4">Carrusel de imágenes de la planta</h3>
-                            <div className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                                isDark ? 'border-gray-600' : 'border-gray-300'
-                            }`}>
-                                <div className="text-6xl mb-4">📷</div>
-                                <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    Selecciona o arrastra 5 fotografías para añadir al carrusel de imágenes
-                                </p>
-                                <Button type="button" variant="outline">
-                                    Seleccionar imágenes
-                                </Button>
-                            </div>
-                        </div>
+                        <ImageUploadSection
+                            uploadedUrls={uploadedImageUrls}
+                            onUpload={uploadImages}
+                            isUploading={uploading}
+                            maxImages={5}
+                            isDark={isDark}
+                        />
 
                         <div>
                             <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
@@ -83,7 +178,9 @@ export function PlantCatalogCreateModal({
                                 Nombre de la planta
                             </p>
                             <Input
-                                placeholder="Ejemplo..."
+                                placeholder="Ejemplo: Rosa"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                                 required
                             />
                         </div>
@@ -95,7 +192,18 @@ export function PlantCatalogCreateModal({
 
                             <div className="mb-4">
                                 <label className="block text-sm font-medium mb-1">Tipo</label>
-                                <Input placeholder="Seleccione..." required />
+                                <select
+                                    value={plantType}
+                                    onChange={(e) => setPlantType(e.target.value)}
+                                    className={`w-full h-9 px-3 rounded-md border ${
+                                        isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                                    }`}
+                                    required
+                                >
+                                    {PLANT_TYPES.map(type => (
+                                        <option key={type} value={type}>{type}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -106,6 +214,8 @@ export function PlantCatalogCreateModal({
                                             type="number"
                                             placeholder="0"
                                             className="rounded-r-none"
+                                            value={minTemp}
+                                            onChange={(e) => setMinTemp(Number(e.target.value))}
                                             required
                                         />
                                         <div className={`flex items-center px-3 border-l-0 border rounded-r-md ${
@@ -123,6 +233,8 @@ export function PlantCatalogCreateModal({
                                             type="number"
                                             placeholder="0"
                                             className="rounded-r-none"
+                                            value={maxTemp}
+                                            onChange={(e) => setMaxTemp(Number(e.target.value))}
                                             required
                                         />
                                         <div className={`flex items-center px-3 border-l-0 border rounded-r-md ${
@@ -136,15 +248,16 @@ export function PlantCatalogCreateModal({
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Nivel de humedad</label>
                                     <select
+                                        value={humidityLevel}
+                                        onChange={(e) => setHumidityLevel(e.target.value)}
                                         className={`w-full h-9 px-3 rounded-md border ${
                                             isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
                                         }`}
                                         required
                                     >
-                                        <option value="">Seleccione...</option>
-                                        <option value="low">Nivel bajo (20% - 30%)</option>
-                                        <option value="medium">Nivel medio (40% - 50%)</option>
-                                        <option value="high">Nivel alto (60% - 70%)</option>
+                                        {HUMIDITY_LEVELS.map(level => (
+                                            <option key={level.value} value={level.value}>{level.label}</option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
@@ -158,40 +271,49 @@ export function PlantCatalogCreateModal({
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Familia</label>
                                     <select
+                                        value={familyId}
+                                        onChange={(e) => setFamilyId(e.target.value)}
                                         className={`w-full h-9 px-3 rounded-md border ${
                                             isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
                                         }`}
                                         required
                                     >
                                         <option value="">Seleccionar</option>
-                                        <option value="1">Rosaceae</option>
-                                        <option value="2">Solanaceae</option>
+                                        {plantFamilies.map(family => (
+                                            <option key={family.id} value={family.id}>{family.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Género</label>
                                     <select
+                                        value={genusId}
+                                        onChange={(e) => setGenusId(e.target.value)}
                                         className={`w-full h-9 px-3 rounded-md border ${
                                             isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
                                         }`}
                                         required
                                     >
                                         <option value="">Seleccionar</option>
-                                        <option value="1">Rosa</option>
-                                        <option value="2">Solanum</option>
+                                        {plantGenera.map(genus => (
+                                            <option key={genus.id} value={genus.id}>{genus.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Especie</label>
                                     <select
+                                        value={speciesId}
+                                        onChange={(e) => setSpeciesId(e.target.value)}
                                         className={`w-full h-9 px-3 rounded-md border ${
                                             isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
                                         }`}
                                         required
                                     >
                                         <option value="">Seleccionar</option>
-                                        <option value="1">Rosa canina</option>
-                                        <option value="2">Solanum lycopersicum</option>
+                                        {plantSpecies.map(species => (
+                                            <option key={species.id} value={species.id}>{species.name}</option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>
@@ -205,8 +327,10 @@ export function PlantCatalogCreateModal({
                                 Descripción
                             </p>
                             <textarea
-                                placeholder="Ejemplo..."
+                                placeholder="Ejemplo: Esta rosa es una variedad..."
                                 rows={4}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 className={`w-full px-3 py-2 border rounded-md resize-none ${
                                     isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300'
                                 }`}
@@ -222,8 +346,10 @@ export function PlantCatalogCreateModal({
                                 Advertencia (opcional)
                             </p>
                             <textarea
-                                placeholder="Ejemplo..."
+                                placeholder="Ejemplo: No es tóxica para mascotas..."
                                 rows={3}
+                                value={warnings}
+                                onChange={(e) => setWarnings(e.target.value)}
                                 className={`w-full px-3 py-2 border rounded-md resize-none ${
                                     isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300'
                                 }`}
@@ -235,11 +361,15 @@ export function PlantCatalogCreateModal({
                                 type="button"
                                 variant="outline"
                                 onClick={handleCancel}
+                                disabled={creating || uploading}
                             >
                                 Cancelar
                             </Button>
-                            <Button type="submit">
-                                Aceptar
+                            <Button
+                                type="submit"
+                                disabled={creating || uploading || uploadedImageUrls.length === 0}
+                            >
+                                {creating ? "Guardando..." : "Aceptar"}
                             </Button>
                         </div>
                     </form>
@@ -282,11 +412,15 @@ export function PlantCatalogCreateModal({
                             <Button
                                 variant="outline"
                                 onClick={() => setShowSubmitConfirm(false)}
+                                disabled={creating}
                             >
                                 No
                             </Button>
-                            <Button onClick={confirmSubmit}>
-                                Sí, agregar
+                            <Button
+                                onClick={confirmSubmit}
+                                disabled={creating}
+                            >
+                                {creating ? "Guardando..." : "Sí, agregar"}
                             </Button>
                         </div>
                     </div>
