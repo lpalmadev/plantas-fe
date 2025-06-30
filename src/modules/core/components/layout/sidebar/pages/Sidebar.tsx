@@ -26,6 +26,7 @@ import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/i
 import { ReactComponent as FamilyPlantsIcon } from "../../../../../../assets/icons/FamilyPlantsIcon.svg";
 import { ReactComponent as GenusPlantsIcon } from "../../../../../../assets/icons/GenusPlantsIcon.svg";
 import { ReactComponent as SpeciesPlantsIcon } from "../../../../../../assets/icons/SpeciesPlantsIcon.svg";
+import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 
 const SIDEBAR_WIDTH_OPEN = "w-64";
 const SIDEBAR_WIDTH_CLOSED = "w-16";
@@ -85,6 +86,12 @@ const Sidebar = ({ user }: SidebarProps) => {
             id: "stats",
             icon: <StatsIcon className="w-6 h-6" />,
             label: "Estadísticas",
+        },
+        {
+            id: "devices",
+            icon: <DevicesIcon className="w-6 h-6" />,
+            label: "Dispositivos",
+            route: "/devices"
         },
         {
             id: "users",
