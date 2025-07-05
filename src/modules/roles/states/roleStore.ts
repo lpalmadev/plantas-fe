@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { roleService } from "../services/roleService";
-import { Role, CreateRoleDTO, validatePermissions } from "../lib/types";
+import { Role, CreateRoleDTO, validatePermissions, RoleFilters, RoleResponse } from "../lib/types";
 import { Module } from "../../module/lib/types";
 
 interface RoleState {
@@ -9,12 +9,23 @@ interface RoleState {
     isLoading: boolean;
     error: string | null;
     creating: boolean;
-
+    totalItems: number;
+    totalPages: number;
+    filters: RoleFilters;
 
     fetchRoles: () => Promise<void>;
     fetchModules: () => Promise<void>;
     createRole: (roleData: CreateRoleDTO) => Promise<void>;
+    setFilters: (filters: Partial<RoleFilters>) => void;
 }
+
+const initialFilters: RoleFilters = {
+    page: 1,
+    limit: 10,
+    search: '',
+    sortBy: 'name',
+    sortOrder: 'asc'
+};
 
 export const useRoleStore = create<RoleState>((set, get) => ({
     roles: [],
@@ -22,12 +33,20 @@ export const useRoleStore = create<RoleState>((set, get) => ({
     isLoading: false,
     error: null,
     creating: false,
+    totalItems: 0,
+    totalPages: 0,
+    filters: initialFilters,
 
     fetchRoles: async () => {
         set({ isLoading: true, error: null });
         try {
-            const roles = await roleService.getAllRoles();
-            set({ roles, isLoading: false });
+            const response = await roleService.getAllRoles(get().filters);
+            set({
+                roles: response.data,
+                totalItems: response.meta.totalItems,
+                totalPages: response.meta.totalPages,
+                isLoading: false
+            });
         } catch (error) {
             set({
                 isLoading: false,
@@ -52,7 +71,6 @@ export const useRoleStore = create<RoleState>((set, get) => ({
     createRole: async (roleData: CreateRoleDTO) => {
         set({ creating: true, error: null });
         try {
-            // Validación de permisos
             const hasInvalidPermissions = roleData.permissions.some(
                 modulePermission => !validatePermissions(modulePermission.permissions)
             );
@@ -60,14 +78,11 @@ export const useRoleStore = create<RoleState>((set, get) => ({
                 throw new Error("Si se selecciona Crear, Editar o Eliminar, el permiso Ver debe estar incluido");
             }
 
-            // Crear el rol
-            const newRole = await roleService.createRole(roleData);
+            await roleService.createRole(roleData);
 
-            // Actualizar el estado
-            set(state => ({
-                roles: [...state.roles, newRole],
-                creating: false
-            }));
+            await get().fetchRoles();
+
+            set({ creating: false });
         } catch (error) {
             set({
                 creating: false,
@@ -75,5 +90,12 @@ export const useRoleStore = create<RoleState>((set, get) => ({
             });
             throw error;
         }
+    },
+
+    setFilters: (filters: Partial<RoleFilters>) => {
+        set(state => ({
+            filters: { ...state.filters, ...filters }
+        }));
+        get().fetchRoles();
     }
 }));
