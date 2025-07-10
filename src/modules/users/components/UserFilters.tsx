@@ -18,10 +18,10 @@ interface UserFiltersProps {
 const sortOptions = [
     { label: "Nombre (A-Z)", value: "name-asc", sortBy: "name", sortOrder: "asc" },
     { label: "Nombre (Z-A)", value: "name-desc", sortBy: "name", sortOrder: "desc" },
-    { label: "Más antigua", value: "created_date-asc", sortBy: "created_date", sortOrder: "asc" },
-    { label: "Más reciente", value: "created_date-desc", sortBy: "created_date", sortOrder: "desc" },
-    { label: "Estado: Activos primero", value: "is_active-desc", sortBy: "is_active", sortOrder: "desc" },
-    { label: "Estado: Inactivos primero", value: "is_active-asc", sortBy: "is_active", sortOrder: "asc" },
+    { label: "Más antigua", value: "registration_date-asc", sortBy: "registration_date", sortOrder: "asc" },
+    { label: "Más reciente", value: "registration_date-desc", sortBy: "registration_date", sortOrder: "desc" },
+    { label: "Estado: Activos primero", value: "status_account-asc", sortBy: "status_account", sortOrder: "asc" },
+    { label: "Estado: Inactivos primero", value: "status_account-desc", sortBy: "status_account", sortOrder: "desc" },
 ];
 
 export function UserFilters({
