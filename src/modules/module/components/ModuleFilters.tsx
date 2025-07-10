@@ -12,6 +12,15 @@ interface ModuleFiltersProps {
     isDark?: boolean;
 }
 
+const sortOptions = [
+    { label: "Nombre (A-Z)", value: "name-asc", sortBy: "name", sortOrder: "asc" },
+    { label: "Nombre (Z-A)", value: "name-desc", sortBy: "name", sortOrder: "desc" },
+    { label: "Más antigua", value: "created_date-asc", sortBy: "created_date", sortOrder: "asc" },
+    { label: "Más reciente", value: "created_date-desc", sortBy: "created_date", sortOrder: "desc" },
+    { label: "Estado: Activos primero", value: "is_active-desc", sortBy: "is_active", sortOrder: "desc" },
+    { label: "Estado: Inactivos primero", value: "is_active-asc", sortBy: "is_active", sortOrder: "asc" },
+];
+
 export function ModuleFilters({
                                   onSearch,
                                   onSortChange,
@@ -30,12 +39,16 @@ export function ModuleFilters({
         onSearch(searchTerm);
     };
 
-    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onSortChange(e.target.value, sortOrder);
-    };
+    const currentSortValue =
+        sortOptions.find(opt => opt.sortBy === sortBy && opt.sortOrder === sortOrder)?.value
+        || "name-asc";
 
-    const handleSortOrderChange = () => {
-        onSortChange(sortBy, sortOrder === "asc" ? "desc" : "asc");
+    const handleSortByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        const found = sortOptions.find(opt => opt.value === value);
+        if (found) {
+            onSortChange(found.sortBy, found.sortOrder as "asc" | "desc");
+        }
     };
 
     return (
@@ -62,7 +75,7 @@ export function ModuleFilters({
             <div className="flex items-center gap-2">
                 <span className={isDark ? "text-gray-300" : "text-gray-700"}>Ordenar por:</span>
                 <select
-                    value={sortBy}
+                    value={currentSortValue}
                     onChange={handleSortByChange}
                     className={`border rounded px-2 py-1.5 ${
                         isDark
@@ -70,16 +83,10 @@ export function ModuleFilters({
                             : "bg-white border-gray-300"
                     }`}
                 >
-                    <option value="name">Nombre</option>
-                    <option value="created_date">Fecha de creación</option>
+                    {sortOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
-                <Button
-                    onClick={handleSortOrderChange}
-                    variant="ghost"
-                    className={`px-2 ${isDark ? "text-white" : ""}`}
-                >
-                    {sortOrder === "asc" ? "↑" : "↓"}
-                </Button>
             </div>
         </div>
     );
