@@ -6,7 +6,7 @@ import { ROUTES } from "./path";
 import LoginPage from "../../auth/pages/LoginPage";
 import ForgotPasswordPage from "../../auth/pages/ForgotPasswordPage";
 import ResetPasswordPage from "../../auth/pages/ResetPasswordPage";
-import Profile from "../../profile/pages/Profile";
+import ProfilePage from "../../profile/pages/ProfilePage";
 import PlantCatalogPage from "../../plants/pages/plant-catalogy/PlantCatalogPage.tsx";
 import UserAdminPage from "../../users/pages/UserPage.tsx";
 import ModulePage from "../../module/pages/ModulePage.tsx";
@@ -25,7 +25,7 @@ export default function MainRouter() {
             </Route>
             <Route element={<PrivateRouter />}>
                 <Route element={<MainLayout />}>
-                    <Route path={ROUTES.PROFILE} element={<Profile />} />
+                    <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
                     <Route path={ROUTES.CATALOG_PLANTS} element={<PlantCatalogPage />} />
                     <Route path={ROUTES.USERS_ADMIN} element={<UserAdminPage />} />
                     <Route path={ROUTES.MODULES} element={<ModulePage />} />
