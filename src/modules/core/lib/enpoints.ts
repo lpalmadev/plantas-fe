@@ -15,5 +15,6 @@ export const API_ENDPOINTS = {
     ADMIN_DEVICES: "https://artistic-victory-env2.up.railway.app/admin/devices",
     ADMIN_DEVICE_BY_ID: (id: string) => `https://artistic-victory-env2.up.railway.app/admin/devices/${id}`,
     ADMIN_DEVICE_REGENERATE_KEY: (id: string) => `https://artistic-victory-env2.up.railway.app/admin/devices/${id}/regenerate-key`,
-    TAXONOMY: "https://artistic-victory-env2.up.railway.app/taxonomy"
+    TAXONOMY: "https://artistic-victory-env2.up.railway.app/taxonomy",
+    USERS_GENERAL_MANAGEMENT: "https://artistic-victory-env2.up.railway.app/users-general-management",
 };
