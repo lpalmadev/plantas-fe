@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { PlantImage } from "../../lib/plant-catalogy/types";
+import {type PlantCatalogFilters, PlantImage} from "../../lib/plant-catalogy/types";
 import { plantCatalogService } from "../../services/plant-catalogy/plantCatalogService";
 
 interface UseImageManagerProps {
     existingImages: PlantImage[];
     setExistingImages: (images: PlantImage[] | ((prev: PlantImage[]) => PlantImage[])) => void;
+    fetchPlants?: () => void;
     plantId?: string;
 }
-export function useImageManager({ existingImages, setExistingImages, plantId }: UseImageManagerProps) {
+export function useImageManager({ existingImages, setExistingImages, plantId, fetchPlants }: UseImageManagerProps) {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imageToAddToPlant, setImageToAddToPlant] = useState<File | null>(null);
     const [processingImageAction, setProcessingImageAction] = useState<string | null>(null);
@@ -49,15 +50,9 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
 
             const updatedImage = await plantCatalogService.updateImageFile(id, formDataImage);
 
-            const cacheBreaker = `?t=${Date.now()}`;
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => prev.map(img =>
-                img.id === id ? {
-                    ...img,
-                    ...updatedImage,
-                    image_url: (updatedImage.image_url || img.image_url) + cacheBreaker
-                } : img
-            ));
+            setExistingImages(updatedPlant.images || []);
 
             setSelectedImage(null);
             const fileInput = document.getElementById('updateImageInput') as HTMLInputElement;
@@ -91,17 +86,11 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
             const formDataImage = new FormData();
             formDataImage.append('image', imageToAddToPlant);
 
-            const response = await plantCatalogService.addImageToPlant(plantId, formDataImage);
+            await plantCatalogService.addImageToPlant(plantId, formDataImage);
 
-            const cacheBreaker = `?t=${Date.now()}`;
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => [
-                ...prev,
-                {
-                    ...response,
-                    image_url: response.image_url + cacheBreaker
-                }
-            ]);
+            setExistingImages(updatedPlant.images || []);
 
             setImageToAddToPlant(null);
             const fileInput = document.getElementById('addImageInput') as HTMLInputElement;
@@ -123,8 +112,11 @@ export function useImageManager({ existingImages, setExistingImages, plantId }: 
 
         try {
             await plantCatalogService.deleteImage(imageId);
+            const updatedPlant = await plantCatalogService.getPlantById(plantId, true);
 
-            setExistingImages(prev => prev.filter(img => img.id !== imageId));
+            setExistingImages(updatedPlant.images || []);
+
+            if (fetchPlants) fetchPlants();
             alert("Imagen eliminada correctamente");
 
         } catch (error) {
