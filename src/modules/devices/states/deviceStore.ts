@@ -19,12 +19,19 @@ interface DeviceState {
     totalPages: number;
     filters: DeviceFilters;
 
+    selectedDevice: Device | null;
+    selectedDeviceLoading: boolean;
+    selectedDeviceError: string | null;
+
     fetchDevices: () => Promise<void>;
     createDevice: (data: CreateDeviceDTO) => Promise<void>;
     updateDevice: (deviceId: string, data: UpdateDeviceDTO) => Promise<void>;
     regenerateKey: (deviceId: string) => Promise<void>;
     clearLastCreatedCode: () => void;
     setFilters: (filters: Partial<DeviceFilters>) => void;
+
+    fetchDeviceById: (deviceId: string) => Promise<void>;
+    clearSelectedDevice: () => void;
 }
 
 const initialFilters: DeviceFilters = {
@@ -51,6 +58,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     totalItems: 0,
     totalPages: 0,
     filters: initialFilters,
+
+    selectedDevice: null,
+    selectedDeviceLoading: false,
+    selectedDeviceError: null,
 
     fetchDevices: async () => {
         set({ isLoading: true, error: null });
@@ -126,5 +137,22 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             filters: { ...state.filters, ...filters }
         }));
         get().fetchDevices();
+    },
+
+    fetchDeviceById: async (deviceId: string) => {
+        set({ selectedDeviceLoading: true, selectedDeviceError: null });
+        try {
+            const device = await deviceService.getDeviceById(deviceId);
+            set({ selectedDevice: device, selectedDeviceLoading: false });
+        } catch (error) {
+            set({
+                selectedDevice: null,
+                selectedDeviceLoading: false,
+                selectedDeviceError: error instanceof Error ? error.message : "Error al obtener detalles"
+            });
+        }
+    },
+    clearSelectedDevice: () => {
+        set({ selectedDevice: null, selectedDeviceError: null });
     }
 }));

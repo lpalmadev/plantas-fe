@@ -19,13 +19,17 @@ export function useDevices() {
         fetchDevices,
         createDevice,
         updateDevice,
-        deleteDevice,
         regenerateKey,
         clearLastCreatedCode,
         totalItems,
         totalPages,
         filters,
-        setFilters
+        setFilters,
+        selectedDevice,
+        selectedDeviceLoading,
+        selectedDeviceError,
+        fetchDeviceById,
+        clearSelectedDevice
     } = useDeviceStore();
 
     useEffect(() => {
@@ -52,7 +56,6 @@ export function useDevices() {
         refetch: fetchDevices,
         createDevice,
         updateDevice,
-        deleteDevice,
         regenerateKey,
         creating,
         updating,
@@ -70,6 +73,11 @@ export function useDevices() {
         handleSearch,
         handlePageChange,
         handleSortChange,
-        setFilters
+        setFilters,
+        selectedDevice,
+        selectedDeviceLoading,
+        selectedDeviceError,
+        fetchDeviceById,
+        clearSelectedDevice
     };
 }

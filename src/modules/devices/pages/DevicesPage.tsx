@@ -12,7 +12,6 @@ import { Device, CreateDeviceDTO, UpdateDeviceDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { DeviceFilters } from "../components/DeviceFilters";
 import { Pagination } from "../components/Pagination";
-import { deviceService } from "../services/deviceService";
 
 const scrollbarHideClass = "scrollbar-none";
 
@@ -20,7 +19,6 @@ export default function DevicesPage() {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [detailsModalOpen, setDetailsModalOpen] = useState(false);
-    const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
 
     const {
         devices,
@@ -38,25 +36,26 @@ export default function DevicesPage() {
         totalPages,
         handleSearch,
         handleSortChange,
-        handlePageChange
+        handlePageChange,
+        selectedDevice,
+        selectedDeviceLoading,
+        selectedDeviceError,
+        fetchDeviceById,
+        clearSelectedDevice
     } = useDevices();
 
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
-    const handleShowDetails = async (device: Device) => {
-        setSelectedDevice(device);
-        setDetailsModalOpen(true);
+    const [localSelectedDevice, setLocalSelectedDevice] = useState<Device | null>(null);
 
-        try {
-            const deviceDetails = await deviceService.getDeviceById(device.id);
-            setSelectedDevice(deviceDetails);
-        } catch (err) {
-        }
+    const handleShowDetails = async (device: Device) => {
+        setDetailsModalOpen(true);
+        await fetchDeviceById(device.id);
     };
 
     const handleEdit = (device: Device) => {
-        setSelectedDevice(device);
+        setLocalSelectedDevice(device);
         setUpdateModalOpen(true);
         setDetailsModalOpen(false);
     };
@@ -86,14 +85,24 @@ export default function DevicesPage() {
 
     const handleDeviceUpdated = async (deviceData: UpdateDeviceDTO) => {
         try {
-            if (selectedDevice) {
-                await updateDevice(selectedDevice.id, deviceData);
+            if (localSelectedDevice) {
+                await updateDevice(localSelectedDevice.id, deviceData);
                 setUpdateModalOpen(false);
-                setSelectedDevice(null);
+                setLocalSelectedDevice(null);
             }
         } catch (error) {
             console.error("Error al actualizar dispositivo:", error);
         }
+    };
+
+    const handleUpdateModalClose = () => {
+        setUpdateModalOpen(false);
+        setLocalSelectedDevice(null);
+    };
+
+    const handleDetailsModalClose = () => {
+        setDetailsModalOpen(false);
+        clearSelectedDevice();
     };
 
     return (
@@ -170,19 +179,16 @@ export default function DevicesPage() {
 
                     <DeviceUpdateModal
                         open={updateModalOpen}
-                        onClose={() => {
-                            setUpdateModalOpen(false);
-                            setSelectedDevice(null);
-                        }}
+                        onClose={handleUpdateModalClose}
                         onSubmitSuccess={handleDeviceUpdated}
-                        device={selectedDevice || undefined}
+                        device={localSelectedDevice || undefined}
                         isDark={isDark}
                     />
 
                     <DeviceDetailsModal
                         open={detailsModalOpen}
                         device={selectedDevice || undefined}
-                        onClose={() => setDetailsModalOpen(false)}
+                        onClose={handleDetailsModalClose}
                         onEdit={handleEdit}
                         onRegenerateKey={handleRegenerateKey}
                         isDark={isDark}
