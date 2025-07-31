@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useThemeStore } from '../../core/states/themeStore';
 import { Faq, FaqType } from '../lib/types';
-import { fetchFaqs } from '../services/faqService';
+import { useFaqChildren } from '../hooks/useFaqs';
 import { ConfirmModal } from './ConfirmModal';
 
 interface FaqItemProps {
@@ -10,6 +10,7 @@ interface FaqItemProps {
     onEdit: (faq: Faq) => void;
     onDelete: (faq: Faq) => void;
     onAddChild: (parent: Faq, type: FaqType) => void;
+    isDeleting?: boolean;
 }
 
 export const FaqItem: React.FC<FaqItemProps> = ({
@@ -18,12 +19,11 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                                                     onEdit,
                                                     onDelete,
                                                     onAddChild,
+                                                    isDeleting = false
                                                 }) => {
     const { mode } = useThemeStore();
     const [expanded, setExpanded] = useState(false);
-    const [children, setChildren] = useState<Faq[]>([]);
-    const [loadingChildren, setLoadingChildren] = useState(false);
-
+    const { children, loading: loadingChildren, loadChildren, setChildren } = useFaqChildren(faq.id);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const handleToggle = async () => {
@@ -32,14 +32,10 @@ export const FaqItem: React.FC<FaqItemProps> = ({
         setExpanded(!expanded);
 
         if (!expanded && children.length === 0) {
-            setLoadingChildren(true);
             try {
-                const childFaqs = await fetchFaqs(faq.id);
-                setChildren(childFaqs);
+                await loadChildren();
             } catch (error) {
                 console.error('Error loading children:', error);
-            } finally {
-                setLoadingChildren(false);
             }
         }
     };
@@ -75,11 +71,11 @@ export const FaqItem: React.FC<FaqItemProps> = ({
     return (
         <>
             <div className="mb-2" style={{ marginLeft }}>
-                <div className={`border-l-4 ${getBorderColor()} rounded p-3 ${getBackgroundColor()}`}>
+                <div className={`border-l-4 ${getBorderColor()} rounded p-3 ${getBackgroundColor()} ${isDeleting ? 'opacity-50' : ''}`}>
                     <div className="flex items-start gap-3">
                         <span className="text-xl flex-shrink-0 mt-1">
-              {faq.type === 'pregunta' ? '❓' : '✅'}
-            </span>
+                            {faq.type === 'pregunta' ? '❓' : '✅'}
+                        </span>
 
                         <div className="flex-1 min-w-0">
                             <div
@@ -118,7 +114,8 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                         <div className="flex flex-col gap-1 flex-shrink-0">
                             <button
                                 onClick={() => onEdit(faq)}
-                                className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors"
+                                disabled={isDeleting}
+                                className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 title="Editar"
                             >
                                 ✏️
@@ -126,7 +123,8 @@ export const FaqItem: React.FC<FaqItemProps> = ({
 
                             <button
                                 onClick={() => onAddChild(faq, faq.type === 'pregunta' ? 'respuesta' : 'pregunta')}
-                                className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 transition-colors"
+                                disabled={isDeleting}
+                                className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 title={`Añadir ${faq.type === 'pregunta' ? 'respuesta' : 'pregunta'}`}
                             >
                                 ➕
@@ -134,16 +132,18 @@ export const FaqItem: React.FC<FaqItemProps> = ({
 
                             <button
                                 onClick={handleDeleteClick}
-                                className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 transition-colors"
+                                disabled={isDeleting}
+                                className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 title="Eliminar"
                             >
-                                🗑️
+                                {isDeleting ? '⏳' : '🗑️'}
                             </button>
 
                             {faq.withchildren && (
                                 <button
                                     onClick={handleToggle}
-                                    className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 transition-colors"
+                                    disabled={isDeleting}
+                                    className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     title={expanded ? 'Contraer' : 'Expandir'}
                                 >
                                     {expanded ? '▼' : '▶'}
@@ -159,8 +159,8 @@ export const FaqItem: React.FC<FaqItemProps> = ({
                             <div className="flex items-center justify-center py-4">
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500"></div>
                                 <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                  Cargando hijos...
-                </span>
+                                    Cargando hijos...
+                                </span>
                             </div>
                         ) : children.length > 0 ? (
                             <div className="space-y-1">

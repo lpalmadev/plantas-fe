@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useThemeStore } from '../../core/states/themeStore';
 import { Faq, FaqType, FaqContent } from '../lib/types';
-import { uploadImage, deleteImage } from '../services/faqService';
+import { useFaqImages } from '../hooks/useFaqs';
 import { ConfirmModal } from './ConfirmModal';
 
 interface FaqFormProps {
@@ -11,6 +11,7 @@ interface FaqFormProps {
     editingFaq?: Faq | null;
     parentFaq?: Faq | null;
     defaultType?: FaqType;
+    saving?: boolean;
 }
 
 export const FaqForm: React.FC<FaqFormProps> = ({
@@ -20,13 +21,14 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                                                     editingFaq,
                                                     parentFaq,
                                                     defaultType = 'pregunta',
+                                                    saving = false
                                                 }) => {
     const { mode } = useThemeStore();
+    const { uploadImages, deleteImageFromServer, uploading, deleting } = useFaqImages();
+
     const [text, setText] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [type, setType] = useState<FaqType>(defaultType);
-    const [uploading, setUploading] = useState(false);
-    const [deleting, setDeleting] = useState<string | null>(null);
 
     const [showDeleteImageModal, setShowDeleteImageModal] = useState(false);
     const [imageToDelete, setImageToDelete] = useState<{url: string, index: number} | null>(null);
@@ -49,18 +51,12 @@ export const FaqForm: React.FC<FaqFormProps> = ({
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
 
-        setUploading(true);
         try {
-            const uploadPromises = files.map(file => uploadImage(file));
-            const results = await Promise.all(uploadPromises);
-            const newUrls = results.flat();
-
+            const newUrls = await uploadImages(files);
             setImages(prev => [...prev, ...newUrls]);
         } catch (error) {
-            console.error('Error uploading images:', error);
             alert('Error al subir imágenes');
         } finally {
-            setUploading(false);
             e.target.value = '';
         }
     };
@@ -73,17 +69,14 @@ export const FaqForm: React.FC<FaqFormProps> = ({
     const handleConfirmDeleteImage = async () => {
         if (!imageToDelete) return;
 
-        setDeleting(imageToDelete.url);
         setShowDeleteImageModal(false);
 
         try {
-            await deleteImage(imageToDelete.url);
+            await deleteImageFromServer(imageToDelete.url);
             setImages(prev => prev.filter((_, i) => i !== imageToDelete.index));
         } catch (error) {
-            console.error('Error deleting image:', error);
             alert('Error al eliminar imagen');
         } finally {
-            setDeleting(null);
             setImageToDelete(null);
         }
     };
@@ -120,7 +113,6 @@ export const FaqForm: React.FC<FaqFormProps> = ({
     if (!isOpen) return null;
 
     const isDark = mode === 'dark';
-
     const isEditing = !!editingFaq;
     const isChild = !!parentFaq;
     const showTypeSelector = !isEditing && !isChild;
@@ -149,7 +141,6 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                     </div>
 
                     <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
                         {showTypeSelector && (
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-white' : 'text-gray-700'}`}>
@@ -175,15 +166,15 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                                 </label>
                                 <div className={`p-3 rounded border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'}`}>
                                     <div className="flex items-center gap-2">
-                    <span className="text-lg">
-                      {type === 'pregunta' ? '❓' : '✅'}
-                    </span>
+                                        <span className="text-lg">
+                                            {type === 'pregunta' ? '❓' : '✅'}
+                                        </span>
                                         <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </span>
+                                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                                        </span>
                                         <span className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
-                      {isEditing ? 'No editable' : 'Automático'}
-                    </span>
+                                            {isEditing ? 'No editable' : 'Automático'}
+                                        </span>
                                     </div>
                                     {isChild && (
                                         <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -281,10 +272,10 @@ export const FaqForm: React.FC<FaqFormProps> = ({
                             </button>
                             <button
                                 type="submit"
-                                disabled={!text.trim() || uploading}
+                                disabled={!text.trim() || uploading || saving}
                                 className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                {uploading ? 'Subiendo...' : editingFaq ? 'Actualizar' : 'Crear'}
+                                {uploading ? 'Subiendo...' : saving ? 'Guardando...' : editingFaq ? 'Actualizar' : 'Crear'}
                             </button>
                         </div>
                     </form>

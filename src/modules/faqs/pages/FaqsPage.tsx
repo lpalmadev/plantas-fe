@@ -1,29 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useThemeStore } from '../../core/states/themeStore';
 import { useAuthStore } from '../../core/states/authStore';
-import { useFaqStore } from '../states/faqStore';
+import { useFaqs, useFaqOperations } from '../hooks/useFaqs';
 import { FaqItem } from '../components/FaqItem';
 import { FaqForm } from '../components/FaqForm';
 import { Faq, FaqType, FaqContent } from '../lib/types';
-import { createFaq, updateFaq, deleteFaq } from '../services/faqService';
 
 const FaqsPage: React.FC = () => {
     const { mode } = useThemeStore();
     const { isAuthenticated } = useAuthStore();
-    const { faqs, loading, error, loadFaqs } = useFaqStore();
+    const { faqs, loading, error, refetch } = useFaqs();
+    const { createFaqItem, updateFaqItem, deleteFaqItem, saving, deleting } = useFaqOperations();
 
     const [showForm, setShowForm] = useState(false);
     const [editingFaq, setEditingFaq] = useState<Faq | null>(null);
     const [parentFaq, setParentFaq] = useState<Faq | null>(null);
     const [defaultType, setDefaultType] = useState<FaqType>('pregunta');
-    const [saving, setSaving] = useState(false);
-    const [deleting, setDeleting] = useState<string | null>(null);
 
     useEffect(() => {
         if (isAuthenticated) {
-            loadFaqs();
+            refetch();
         }
-    }, [isAuthenticated, loadFaqs]);
+    }, [isAuthenticated, refetch]);
 
     const handleEdit = (faq: Faq) => {
         setEditingFaq(faq);
@@ -39,33 +37,25 @@ const FaqsPage: React.FC = () => {
     };
 
     const handleDelete = async (faq: Faq) => {
-        setDeleting(faq.id);
         try {
-            await deleteFaq(faq.id);
-            await loadFaqs();
+            await deleteFaqItem(faq.id);
         } catch (error) {
             console.error('Error deleting FAQ:', error);
             alert('Error al eliminar FAQ');
-        } finally {
-            setDeleting(null);
         }
     };
 
     const handleSave = async (content: FaqContent, type: FaqType, parentId?: string) => {
-        setSaving(true);
         try {
             if (editingFaq) {
-                await updateFaq(editingFaq.id, content);
+                await updateFaqItem(editingFaq.id, content);
             } else {
-                await createFaq(type, content, parentId);
+                await createFaqItem(type, content, parentId);
             }
-            await loadFaqs();
             handleCloseForm();
         } catch (error) {
             console.error('Error saving FAQ:', error);
             alert('Error al guardar FAQ');
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -83,7 +73,7 @@ const FaqsPage: React.FC = () => {
     };
 
     const handleRefresh = () => {
-        loadFaqs();
+        refetch();
     };
 
     if (!isAuthenticated) {
@@ -180,6 +170,7 @@ const FaqsPage: React.FC = () => {
                                         onEdit={handleEdit}
                                         onDelete={handleDelete}
                                         onAddChild={handleAddChild}
+                                        isDeleting={deleting === faq.id}
                                     />
                                 ))}
                             </div>
@@ -204,6 +195,7 @@ const FaqsPage: React.FC = () => {
                 editingFaq={editingFaq}
                 parentFaq={parentFaq}
                 defaultType={defaultType}
+                saving={saving}
             />
 
             {saving && (
@@ -211,8 +203,8 @@ const FaqsPage: React.FC = () => {
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
                         <span className="text-gray-900 dark:text-white">
-              {editingFaq ? 'Actualizando FAQ...' : 'Creando FAQ...'}
-            </span>
+                            {editingFaq ? 'Actualizando FAQ...' : 'Creando FAQ...'}
+                        </span>
                     </div>
                 </div>
             )}

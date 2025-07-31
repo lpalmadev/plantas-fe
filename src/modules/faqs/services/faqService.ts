@@ -26,7 +26,6 @@ const getFormDataHeaders = () => {
     };
 };
 
-// Obtener FAQs
 export async function fetchFaqs(parentId?: string): Promise<Faq[]> {
     let url = API_ENDPOINTS.FAQS;
     if (parentId) {
@@ -51,7 +50,6 @@ export async function fetchFaqs(parentId?: string): Promise<Faq[]> {
     return data.data;
 }
 
-// Crear FAQ
 export async function createFaq(type: FaqType, content: FaqContent, parentId?: string): Promise<{ id: string }> {
     const body: CreateFaqRequest = { type, content };
     if (parentId) {
@@ -77,7 +75,6 @@ export async function createFaq(type: FaqType, content: FaqContent, parentId?: s
     return result;
 }
 
-// Actualizar FAQ
 export async function updateFaq(id: string, content: FaqContent): Promise<{ id: string }> {
     const body: UpdateFaqRequest = { content };
 
@@ -100,7 +97,6 @@ export async function updateFaq(id: string, content: FaqContent): Promise<{ id: 
     return result;
 }
 
-// Eliminar FAQ
 export async function deleteFaq(id: string): Promise<void> {
     console.log('Deleting FAQ:', id);
 
