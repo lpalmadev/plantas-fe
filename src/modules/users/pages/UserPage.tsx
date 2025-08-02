@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../core/components/layout/sidebar/pages/Sidebar.tsx";
 import { DataTable } from "../../core/components/ui/data-table";
 import { createUserColumns } from "../components/UserColumns";
@@ -13,6 +13,7 @@ import { CreateUserDTO, EditUserDTO, User } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { UserFilters } from "../components/UserFilters";
 import { Pagination } from "../components/Pagination";
+import { toast } from "sonner";
 
 const scrollbarHideClass = "scrollbar-none";
 
@@ -43,8 +44,15 @@ export default function UserPage() {
         clearUserDetails,
         setFilters,
     } = useUsers();
+
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error, { description: "Error en gestión de usuarios" });
+        }
+    }, [error]);
 
     const handleRoleChange = (roleId: string) => {
         setSelectedRoleId(roleId);
@@ -54,6 +62,7 @@ export default function UserPage() {
             page: 1
         });
     };
+
     function handleShowDetails(user: User) {
         setSelectedUser(user);
         fetchUserDetails(user.id);
@@ -71,7 +80,6 @@ export default function UserPage() {
             await createUser(userData);
             setModalOpen(false);
         } catch (error) {
-            console.error("Error al crear usuario:", error);
         }
     }
 
@@ -83,7 +91,6 @@ export default function UserPage() {
                 setSelectedUser(null);
                 clearUserDetails();
             } catch (error) {
-                console.error("Error al actualizar usuario:", error);
             }
         }
     }
@@ -134,10 +141,6 @@ export default function UserPage() {
                         {isLoading ? (
                             <div className={`flex justify-center items-center h-full ${isDark ? 'text-gray-300' : ''}`}>
                                 Cargando...
-                            </div>
-                        ) : error ? (
-                            <div className={`${isDark ? 'text-red-400' : 'text-red-500'} text-center flex items-center justify-center h-full`}>
-                                {error}
                             </div>
                         ) : (
                             <div className={`h-full overflow-auto ${scrollbarHideClass}`}>

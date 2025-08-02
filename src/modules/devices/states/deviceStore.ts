@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { deviceService } from "../services/deviceService";
 import type { Device, CreateDeviceDTO, UpdateDeviceDTO, DeviceFilters } from "../lib/types";
+import { mapErrorMessage } from "../utils/errorMapper";
 
 interface DeviceState {
     devices: Device[];
@@ -10,10 +11,10 @@ interface DeviceState {
     updating: boolean;
     deleting: boolean;
     regenerating: boolean;
-    createError: Error | null;
-    updateError: Error | null;
-    deleteError: Error | null;
-    regenerateError: Error | null;
+    createError: string | null;
+    updateError: string | null;
+    deleteError: string | null;
+    regenerateError: string | null;
     lastCreatedLinkingCode: string | null;
     totalItems: number;
     totalPages: number;
@@ -32,6 +33,10 @@ interface DeviceState {
 
     fetchDeviceById: (deviceId: string) => Promise<void>;
     clearSelectedDevice: () => void;
+
+    clearCreateError: () => void;
+    clearUpdateError: () => void;
+    clearRegenerateError: () => void;
 }
 
 const initialFilters: DeviceFilters = {
@@ -73,10 +78,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
                 totalPages: response.meta.totalPages,
                 isLoading: false
             });
-        } catch (error) {
+        } catch (error: any) {
             set({
                 isLoading: false,
-                error: error instanceof Error ? error.message : "Error al obtener los dispositivos"
+                error: mapErrorMessage(error)
             });
         }
     },
@@ -88,10 +93,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set({ lastCreatedLinkingCode: response.linking_code || null });
             await get().fetchDevices();
             set({ creating: false });
-        } catch (error) {
+        } catch (error: any) {
             set({
                 creating: false,
-                createError: error instanceof Error ? error : new Error("Error al crear el dispositivo")
+                createError: mapErrorMessage(error)
             });
             throw error;
         }
@@ -103,10 +108,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             await deviceService.updateDevice(deviceId, data);
             await get().fetchDevices();
             set({ updating: false });
-        } catch (error) {
+        } catch (error: any) {
             set({
                 updating: false,
-                updateError: error instanceof Error ? error : new Error("Error al actualizar el dispositivo")
+                updateError: mapErrorMessage(error)
             });
             throw error;
         }
@@ -119,10 +124,10 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
             set({ lastCreatedLinkingCode: response.linking_code });
             await get().fetchDevices();
             set({ regenerating: false });
-        } catch (error) {
+        } catch (error: any) {
             set({
                 regenerating: false,
-                regenerateError: error instanceof Error ? error : new Error("Error al regenerar la clave")
+                regenerateError: mapErrorMessage(error)
             });
             throw error;
         }
@@ -144,15 +149,20 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
         try {
             const device = await deviceService.getDeviceById(deviceId);
             set({ selectedDevice: device, selectedDeviceLoading: false });
-        } catch (error) {
+        } catch (error: any) {
             set({
                 selectedDevice: null,
                 selectedDeviceLoading: false,
-                selectedDeviceError: error instanceof Error ? error.message : "Error al obtener detalles"
+                selectedDeviceError: mapErrorMessage(error)
             });
         }
     },
+
     clearSelectedDevice: () => {
         set({ selectedDevice: null, selectedDeviceError: null });
-    }
+    },
+
+    clearCreateError: () => set({ createError: null }),
+    clearUpdateError: () => set({ updateError: null }),
+    clearRegenerateError: () => set({ regenerateError: null }),
 }));

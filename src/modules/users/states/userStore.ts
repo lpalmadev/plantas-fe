@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { userService } from "../services/userService";
 import { User, CreateUserDTO, EditUserDTO, Role, UserFilters } from "../lib/types";
+import { mapUserErrorMessage } from "../utils/errorMapper";
 
 interface UserState {
     users: User[];
@@ -59,7 +60,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             set({
                 isLoading: false,
-                error: error instanceof Error ? error.message : "Error al obtener los usuarios"
+                error: mapUserErrorMessage(error)
             });
         }
     },
@@ -72,7 +73,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             set({
                 isLoading: false,
-                error: error instanceof Error ? error.message : "Error al obtener los roles"
+                error: mapUserErrorMessage(error)
             });
         }
     },
@@ -85,7 +86,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             set({
                 fetchingDetails: false,
-                error: error instanceof Error ? error.message : "Error al obtener detalles del usuario"
+                error: mapUserErrorMessage(error)
             });
         }
     },
@@ -99,7 +100,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             set({
                 creating: false,
-                error: error instanceof Error ? error.message : "Error al crear el usuario"
+                error: mapUserErrorMessage(error)
             });
             throw error;
         }
@@ -114,7 +115,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         } catch (error) {
             set({
                 updating: false,
-                error: error instanceof Error ? error.message : "Error al actualizar el usuario"
+                error: mapUserErrorMessage(error)
             });
             throw error;
         }

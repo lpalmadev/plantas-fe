@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./modules/core/components/providers/ThemeProvider";
 import { useAuthStore } from "./modules/core/states/authStore";
 import { useEffect } from "react";
+import { Toaster } from "sonner";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function App() {
             <ThemeProvider>
                 <BrowserRouter>
                     <MainRouter />
+                    <Toaster richColors position="top-right" />
                 </BrowserRouter>
             </ThemeProvider>
         </QueryClientProvider>

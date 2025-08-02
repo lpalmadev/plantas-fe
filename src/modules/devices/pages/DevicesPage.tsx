@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "../../core/components/ui/data-table";
 import { createDeviceColumns } from "../components/DeviceColumns";
 import { Button } from "../../core/components/ui/button";
@@ -12,6 +12,7 @@ import { Device, CreateDeviceDTO, UpdateDeviceDTO } from "../lib/types";
 import { useThemeStore } from "../../core/states/themeStore";
 import { DeviceFilters } from "../components/DeviceFilters";
 import { Pagination } from "../components/Pagination";
+import { toast } from "sonner";
 
 const scrollbarHideClass = "scrollbar-none";
 
@@ -30,6 +31,9 @@ export default function DevicesPage() {
         creating,
         updating,
         regenerating,
+        createError,
+        updateError,
+        regenerateError,
         lastCreatedLinkingCode,
         clearLastCreatedCode,
         filters,
@@ -41,13 +45,37 @@ export default function DevicesPage() {
         selectedDeviceLoading,
         selectedDeviceError,
         fetchDeviceById,
-        clearSelectedDevice
+        clearSelectedDevice,
+        clearCreateError,
+        clearUpdateError,
+        clearRegenerateError
     } = useDevices();
 
     const { mode } = useThemeStore();
     const isDark = mode === 'dark';
 
     const [localSelectedDevice, setLocalSelectedDevice] = useState<Device | null>(null);
+
+    useEffect(() => {
+        if (createError) {
+            toast.error(createError, { description: "Error al crear dispositivo" });
+            clearCreateError();
+        }
+    }, [createError, clearCreateError]);
+
+    useEffect(() => {
+        if (updateError) {
+            toast.error(updateError, { description: "Error al actualizar dispositivo" });
+            clearUpdateError();
+        }
+    }, [updateError, clearUpdateError]);
+
+    useEffect(() => {
+        if (regenerateError) {
+            toast.error(regenerateError, { description: "Error al regenerar clave" });
+            clearRegenerateError();
+        }
+    }, [regenerateError, clearRegenerateError]);
 
     const handleShowDetails = async (device: Device) => {
         setDetailsModalOpen(true);
@@ -64,7 +92,6 @@ export default function DevicesPage() {
         try {
             await regenerateKey(device.id);
         } catch (error) {
-            console.error("Error al regenerar la clave:", error);
         }
     };
 
@@ -74,7 +101,6 @@ export default function DevicesPage() {
         try {
             await createDevice(deviceData);
         } catch (error) {
-            console.error("Error al crear dispositivo:", error);
         }
     };
 
@@ -91,7 +117,6 @@ export default function DevicesPage() {
                 setLocalSelectedDevice(null);
             }
         } catch (error) {
-            console.error("Error al actualizar dispositivo:", error);
         }
     };
 
