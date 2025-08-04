@@ -1,7 +1,6 @@
 import { useSidebarState } from "../sidebar/hooks/useSidebarState";
 import { useThemeStore } from "../../../states/themeStore";
 import { ReactComponent as MenuIcon } from "../../../../../assets/icons/MenuIcon.svg";
-import { ReactComponent as MarketPlaceIcon } from "../../../../../assets/icons/MarcketPlaceIcon.svg";
 import MacetaLogo from "../../../../../assets/images/MacetasLogo.svg";
 import ProfileDropdown from "../sidebar/components/ProfileDropdown";
 import { useAuthStore } from "../../../states/authStore";
@@ -38,7 +37,6 @@ const Navbar = () => {
                 <img src={MacetaLogo} alt="Logo Maceta" className="h-6 select-none" draggable={false} />
             </div>
             <div className="flex items-center gap-4">
-                <MarketPlaceIcon className="w-7 h-7" />
                 <ProfileDropdown user={currentUser} isOpen={true} />
             </div>
         </header>

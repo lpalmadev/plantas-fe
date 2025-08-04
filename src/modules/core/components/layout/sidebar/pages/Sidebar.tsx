@@ -18,6 +18,8 @@ import { ReactComponent as ManagmentModulesIcon } from "../../../../../../assets
 import { ReactComponent as ManagmentRolesIcon } from "../../../../../../assets/icons/ManagmentRolesIcon.svg";
 import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/icons/CatalogyPlantsIcon.svg";
 import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
+import { ReactComponent as MarcketPlaceIcon } from "../../../../../../assets/icons/MarcketPlaceIcon.svg";
+import { ReactComponent as CategoriesIcon } from "../../../../../../assets/icons/CategoriesIcon.svg";
 
 const SIDEBAR_WIDTH = "w-64";
 const NAVBAR_HEIGHT = "h-16"
@@ -104,7 +106,15 @@ const Sidebar = ({ user }: SidebarProps) => {
             icon: <FaqIcon className="w-6 h-6" />,
             label: "FAQ",
             subItems: [
-                { id: "faq-program", label: "Programación de FAQ", icon: <FaqIcon2 className="w-5 h-5" />, route: "/faqs" }, //HOLA
+                { id: "faq-program", label: "Programación de FAQ", icon: <FaqIcon2 className="w-5 h-5" />, route: "/faqs" },
+            ],
+        },
+        {
+            id: "marketplace",
+            icon: <MarcketPlaceIcon className="w-6 h-6" />,
+            label: "Marketplace",
+            subItems: [
+                { id: "marketplace-categories", label: "Categorías", icon: <CategoriesIcon className="w-5 h-5" />, route: "/marketplace/categories" },
             ],
         },
     ];
