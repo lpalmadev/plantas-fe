@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { Category } from "../lib/types";
 import { fetchCategories } from "../services/categoryService";
+import { mapErrorMessage } from "../utils/errorMapper";
 
 interface CategoryState {
     categories: Category[];
@@ -11,6 +12,7 @@ interface CategoryState {
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
     clearState: () => void;
+    clearError: () => void;
 }
 
 export const useCategoryStore = create<CategoryState>((set, get) => ({
@@ -26,7 +28,11 @@ export const useCategoryStore = create<CategoryState>((set, get) => ({
             const categories = await fetchCategories();
             set({ categories, loading: false });
         } catch (error: any) {
-            set({ error: error.message, loading: false, categories: [] });
+            set({
+                error: mapErrorMessage(error),
+                loading: false,
+                categories: []
+            });
         }
     },
 
@@ -34,4 +40,5 @@ export const useCategoryStore = create<CategoryState>((set, get) => ({
     setLoading: (loading: boolean) => set({ loading }),
     setError: (error: string | null) => set({ error }),
     clearState: () => set({ categories: [], loading: false, error: null }),
+    clearError: () => set({ error: null }),
 }));

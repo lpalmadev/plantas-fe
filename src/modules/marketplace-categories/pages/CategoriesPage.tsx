@@ -5,11 +5,24 @@ import { useCategories, useCategoryOperations } from "../hooks/useCategories";
 import { CategoryItem } from "../components/CategoryItem";
 import { CategoryForm } from "../components/CategoryForm";
 import { Category } from "../lib/types";
+import { toast } from "sonner";
+
 const CategoriesPage: React.FC = () => {
     const { mode } = useThemeStore();
     const { isAuthenticated } = useAuthStore();
-    const { categories, loading, error, refetch } = useCategories();
-    const { createCategoryItem, updateCategoryItem, saving, deactivating } = useCategoryOperations();
+    const { categories, loading, error, refetch, clearError } = useCategories();
+    const {
+        createCategoryItem,
+        updateCategoryItem,
+        saving,
+        deactivating,
+        createError,
+        updateError,
+        deactivateError,
+        clearCreateError,
+        clearUpdateError,
+        clearDeactivateError
+    } = useCategoryOperations();
 
     const [showForm, setShowForm] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -20,6 +33,34 @@ const CategoriesPage: React.FC = () => {
             refetch();
         }
     }, [isAuthenticated, refetch]);
+
+    useEffect(() => {
+        if (createError) {
+            toast.error(createError, { description: "Error al crear categoría" });
+            clearCreateError();
+        }
+    }, [createError, clearCreateError]);
+
+    useEffect(() => {
+        if (updateError) {
+            toast.error(updateError, { description: "Error al actualizar categoría" });
+            clearUpdateError();
+        }
+    }, [updateError, clearUpdateError]);
+
+    useEffect(() => {
+        if (deactivateError) {
+            toast.error(deactivateError, { description: "Error al desactivar categoría" });
+            clearDeactivateError();
+        }
+    }, [deactivateError, clearDeactivateError]);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error, { description: "Error al cargar categorías" });
+            clearError();
+        }
+    }, [error, clearError]);
 
     const handleEdit = (cat: Category) => {
         setEditingCategory(cat);
@@ -41,16 +82,28 @@ const CategoriesPage: React.FC = () => {
                     is_active,
                     image_url,
                 });
+                toast.success("Categoría actualizada exitosamente");
             } else {
                 await createCategoryItem({
                     name,
                     parent_id,
                     image_url,
                 });
+                toast.success("Categoría creada exitosamente");
             }
             handleCloseForm();
         } catch (error) {
-            alert("Error al guardar categoría");
+        }
+    };
+
+    const handleDeactivate = async (category: Category) => {
+        try {
+            await updateCategoryItem(category.id, {
+                name: category.name,
+                is_active: false
+            });
+            toast.success("Categoría desactivada exitosamente");
+        } catch (error) {
         }
     };
 
@@ -129,20 +182,6 @@ const CategoriesPage: React.FC = () => {
                                     Cargando categorías...
                                 </p>
                             </div>
-                        ) : error ? (
-                            <div className="text-center py-12">
-                                <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                                <h3 className="text-lg font-semibold text-red-600 mb-2">
-                                    Error al cargar categorías
-                                </h3>
-                                <p className="text-red-500 mb-4">{error}</p>
-                                <button
-                                    onClick={handleRefresh}
-                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                >
-                                    Reintentar
-                                </button>
-                            </div>
                         ) : rootCategories.length === 0 ? (
                             <div className="text-center py-12">
                                 <div className="text-6xl mb-4">📁</div>
@@ -166,6 +205,7 @@ const CategoriesPage: React.FC = () => {
                                         key={cat.id}
                                         category={cat}
                                         onEdit={handleEdit}
+                                        onDeactivate={handleDeactivate}
                                         onAddChild={handleAddChild}
                                         isDeactivating={deactivating === cat.id}
                                     />

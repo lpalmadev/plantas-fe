@@ -3,6 +3,7 @@ import { useThemeStore } from '../../core/states/themeStore';
 import { Category } from '../lib/types';
 import { useCategoryImages } from '../hooks/useCategories';
 import { ConfirmModal } from './ConfirmModal';
+import { toast } from "sonner";
 
 interface CategoryFormProps {
     isOpen: boolean;
@@ -22,7 +23,17 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                                                               saving = false
                                                           }) => {
     const { mode } = useThemeStore();
-    const { uploadImage, deleteImageFromServer, updateImageOnServer, uploading, deleting } = useCategoryImages();
+    const {
+        uploadImage,
+        deleteImageFromServer,
+        updateImageOnServer,
+        uploading,
+        deleting,
+        uploadError,
+        deleteError,
+        clearUploadError,
+        clearDeleteError
+    } = useCategoryImages();
 
     const [name, setName] = useState('');
     const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
@@ -30,6 +41,20 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     const [isActive, setIsActive] = useState(true);
 
     const [showDeleteImageModal, setShowDeleteImageModal] = useState(false);
+
+    useEffect(() => {
+        if (uploadError) {
+            toast.error(uploadError, { description: "Error al subir imagen" });
+            clearUploadError();
+        }
+    }, [uploadError, clearUploadError]);
+
+    useEffect(() => {
+        if (deleteError) {
+            toast.error(deleteError, { description: "Error al eliminar imagen" });
+            clearDeleteError();
+        }
+    }, [deleteError, clearDeleteError]);
 
     useEffect(() => {
         if (isOpen) {
@@ -65,8 +90,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                 await deleteImageFromServer(editingCategory.id, imageUrl);
                 setImageUrl(undefined);
                 setImageFile(null);
+                toast.success("Imagen eliminada exitosamente");
             } catch (error) {
-                alert('Error al eliminar imagen');
             }
         } else {
             setImageUrl(undefined);
@@ -82,7 +107,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            alert('El nombre es requerido');
+            toast.error("El nombre es requerido");
             return;
         }
 
@@ -100,7 +125,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             }
             onSave(name.trim(), finalImageUrl, parentCategory?.id, isActive);
         } catch (err) {
-            alert('Error al actualizar la categoría o la imagen');
+            toast.error('Error al actualizar la categoría o la imagen');
         }
     };
 

@@ -32,7 +32,7 @@ export function useDevices() {
         clearSelectedDevice,
         clearCreateError,
         clearUpdateError,
-        clearRegenerateError, // <-- ¡AGREGADO!
+        clearRegenerateError,
     } = useDeviceStore();
 
     useEffect(() => {
@@ -82,8 +82,8 @@ export function useDevices() {
         selectedDeviceError,
         fetchDeviceById,
         clearSelectedDevice,
-        clearCreateError,      // <-- ¡AGREGADO!
-        clearUpdateError,      // <-- ¡AGREGADO!
-        clearRegenerateError,  // <-- ¡AGREGADO!
+        clearCreateError,
+        clearUpdateError,
+        clearRegenerateError,
     };
 }

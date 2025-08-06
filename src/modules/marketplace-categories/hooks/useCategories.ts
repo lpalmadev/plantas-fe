@@ -9,26 +9,32 @@ import {
     updateCategoryImage,
     deleteCategoryImage
 } from "../services/categoryService";
+import { mapErrorMessage } from "../utils/errorMapper";
 
 export function useCategories() {
-    const { categories, loading, error, loadCategories } = useCategoryStore();
+    const { categories, loading, error, loadCategories, clearError } = useCategoryStore();
     const refetch = useCallback(() => {
         loadCategories();
     }, [loadCategories]);
-    return { categories, loading, error, refetch, loadCategories };
+    return { categories, loading, error, refetch, loadCategories, clearError };
 }
 
 export function useCategoryOperations() {
     const { loadCategories } = useCategoryStore();
     const [saving, setSaving] = useState(false);
     const [deactivating, setDeactivating] = useState<string | null>(null);
+    const [createError, setCreateError] = useState<string | null>(null);
+    const [updateError, setUpdateError] = useState<string | null>(null);
+    const [deactivateError, setDeactivateError] = useState<string | null>(null);
 
     const createCategoryItem = useCallback(async (request: CreateCategoryRequest) => {
         setSaving(true);
+        setCreateError(null);
         try {
             await createCategory(request);
             await loadCategories();
-        } catch (error) {
+        } catch (error: any) {
+            setCreateError(mapErrorMessage(error));
             throw error;
         } finally {
             setSaving(false);
@@ -37,10 +43,12 @@ export function useCategoryOperations() {
 
     const updateCategoryItem = useCallback(async (id: string, request: UpdateCategoryRequest) => {
         setSaving(true);
+        setUpdateError(null);
         try {
             await updateCategory(id, request);
             await loadCategories();
-        } catch (error) {
+        } catch (error: any) {
+            setUpdateError(mapErrorMessage(error));
             throw error;
         } finally {
             setSaving(false);
@@ -49,15 +57,21 @@ export function useCategoryOperations() {
 
     const deactivateCategoryItem = useCallback(async (id: string, name: string) => {
         setDeactivating(id);
+        setDeactivateError(null);
         try {
             await updateCategory(id, { name, is_active: false });
             await loadCategories();
-        } catch (error) {
+        } catch (error: any) {
+            setDeactivateError(mapErrorMessage(error));
             throw error;
         } finally {
             setDeactivating(null);
         }
     }, [loadCategories]);
+
+    const clearCreateError = () => setCreateError(null);
+    const clearUpdateError = () => setUpdateError(null);
+    const clearDeactivateError = () => setDeactivateError(null);
 
     return {
         createCategoryItem,
@@ -65,6 +79,12 @@ export function useCategoryOperations() {
         deactivateCategoryItem,
         saving,
         deactivating,
+        createError,
+        updateError,
+        deactivateError,
+        clearCreateError,
+        clearUpdateError,
+        clearDeactivateError,
     };
 }
 
@@ -81,7 +101,7 @@ export function useCategoryChildren(parent_id?: string) {
             const data = await fetchCategories(parent_id);
             setChildren(data);
         } catch (err: any) {
-            setError(err.message);
+            setError(mapErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -93,12 +113,16 @@ export function useCategoryChildren(parent_id?: string) {
 export function useCategoryImages() {
     const [uploading, setUploading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const uploadImage = useCallback(async (file: File): Promise<string> => {
         setUploading(true);
+        setUploadError(null);
         try {
             return await uploadCategoryImage(file);
-        } catch (error) {
+        } catch (error: any) {
+            setUploadError(mapErrorMessage(error));
             throw error;
         } finally {
             setUploading(false);
@@ -106,25 +130,38 @@ export function useCategoryImages() {
     }, []);
 
     const updateImageOnServer = useCallback(async (id: string, file: File) => {
-        return await updateCategoryImage(id, file);
+        try {
+            return await updateCategoryImage(id, file);
+        } catch (error: any) {
+            throw error;
+        }
     }, []);
 
     const deleteImageFromServer = useCallback(async (id: string, image_url: string): Promise<void> => {
         setDeleting(image_url);
+        setDeleteError(null);
         try {
             await deleteCategoryImage(id, image_url);
-        } catch (error) {
+        } catch (error: any) {
+            setDeleteError(mapErrorMessage(error));
             throw error;
         } finally {
             setDeleting(null);
         }
     }, []);
 
+    const clearUploadError = () => setUploadError(null);
+    const clearDeleteError = () => setDeleteError(null);
+
     return {
         uploadImage,
         updateImageOnServer,
         deleteImageFromServer,
         uploading,
-        deleting
+        deleting,
+        uploadError,
+        deleteError,
+        clearUploadError,
+        clearDeleteError
     };
 }
