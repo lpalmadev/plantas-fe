@@ -11,7 +11,7 @@ import { DeleteConfirmationModal } from "../../components/plant-catalogy/DeleteC
 import { Pagination } from "../../components/plant-catalogy/Pagination";
 import { usePlantCatalog } from "../../hooks/plant-catalogy/usePlantCatalog";
 import { useThemeStore } from "../../../core/states/themeStore";
-{/*HOLAAA*/}
+
 export default function PlantCatalogPage() {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);

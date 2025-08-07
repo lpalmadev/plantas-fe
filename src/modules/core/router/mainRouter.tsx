@@ -15,6 +15,7 @@ import DevicesPage from "../../devices/pages/DevicesPage.tsx";
 import UserGeneralPage from "../../users-generales/pages/UserGeneralPage.tsx";
 import FaqsPage from "../../faqs/pages/FaqsPage";
 import CategoriesPage from "../../marketplace-categories/pages/CategoriesPage.tsx";
+import ProductsPage from "../../marketplace-products/pages/ProductsPage.tsx";
 
 export default function MainRouter() {
     return (
@@ -36,6 +37,7 @@ export default function MainRouter() {
                     <Route path={ROUTES.USERS_GENERAL_ADMIN} element={<UserGeneralPage />} />
                     <Route path={ROUTES.FAQS} element={<FaqsPage />} />
                     <Route path={ROUTES.MARKETPLACE_CATEGORIES} element={<CategoriesPage />} />
+                    <Route path={ROUTES.MARKETPLACE_PRODUCTS} element={<ProductsPage />} />
                 </Route>
             </Route>
         </Routes>

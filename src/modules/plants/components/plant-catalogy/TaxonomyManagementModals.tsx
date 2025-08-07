@@ -176,4 +176,3 @@ export function TaxonomyDeleteModal({
         </div>
     );
 }
-{/*ESTA ES UNA PAUSA PARA ELL CONTROL Z*/}

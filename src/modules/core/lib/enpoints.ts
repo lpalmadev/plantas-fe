@@ -30,4 +30,11 @@ export const API_ENDPOINTS = {
     MARKETPLACE_CATEGORIES_BY_PARENT: (parent_id: string) => `http://localhost:3000/marketplace/categories?parent_id=${parent_id}`,
     MARKETPLACE_CATEGORY_UPLOAD_IMAGE: "http://localhost:3000/marketplace/categories/upload-image",
     MARKETPLACE_CATEGORY_IMAGE: (id: string) => `http://localhost:3000/marketplace/categories/${id}/image`,
+
+    MARKETPLACE_PRODUCTS: "http://localhost:3000/marketplace/products",
+    MARKETPLACE_PRODUCT_BY_ID: (id: string) => `http://localhost:3000/marketplace/products/${id}`,
+    MARKETPLACE_PRODUCT_UPLOAD_IMAGE: "http://localhost:3000/marketplace/products/upload-image",
+    MARKETPLACE_PRODUCT_MAIN_IMAGE: (id: string) => `http://localhost:3000/marketplace/products/${id}/main-image`,
+    MARKETPLACE_PRODUCT_IMAGES: (id: string) => `http://localhost:3000/marketplace/products/${id}/images`,
+    MARKETPLACE_PRODUCT_IMAGE_BY_ID: (productId: string, imageId: string) => `http://localhost:3000/marketplace/products/${productId}/images/${imageId}`,
 };

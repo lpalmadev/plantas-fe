@@ -10,5 +10,6 @@ export const ROUTES = {
         DEVICES: "/devices",
         USERS_GENERAL_ADMIN: "/users-general-management",
         FAQS: "/faqs",
-        MARKETPLACE_CATEGORIES: "/marketplace/categories"
+        MARKETPLACE_CATEGORIES: "/marketplace/categories",
+        MARKETPLACE_PRODUCTS: "/marketplace/products"
 };

@@ -20,6 +20,7 @@ import { ReactComponent as CatalogyPlantsIcon } from "../../../../../../assets/i
 import { ReactComponent as DevicesIcon } from "../../../../../../assets/icons/DevicesIcon.svg";
 import { ReactComponent as MarcketPlaceIcon } from "../../../../../../assets/icons/MarcketPlaceIcon.svg";
 import { ReactComponent as CategoriesIcon } from "../../../../../../assets/icons/CategoriesIcon.svg";
+import { ReactComponent as ProductIcon } from "../../../../../../assets/icons/ProductIcon.svg";
 
 const SIDEBAR_WIDTH = "w-64";
 const NAVBAR_HEIGHT = "h-16"
@@ -115,6 +116,7 @@ const Sidebar = ({ user }: SidebarProps) => {
             label: "Marketplace",
             subItems: [
                 { id: "marketplace-categories", label: "Categorías", icon: <CategoriesIcon className="w-5 h-5" />, route: "/marketplace/categories" },
+                { id: "marketplace-products", label: "Productos", icon: <ProductIcon className="w-5 h-5" />, route: "/marketplace/products" },
             ],
         },
     ];

@@ -141,3 +141,103 @@ export async function deleteCategoryImage(id: string, image_url: string): Promis
         await handleResponseError(response);
     }
 }
+
+
+export interface CategoryWithHierarchy extends Category {
+    level: number;
+    fullPath: string;
+    children?: CategoryWithHierarchy[];
+}
+
+export async function fetchAllCategoriesWithHierarchy(): Promise<CategoryWithHierarchy[]> {
+    try {
+        const rootCategories = await fetchCategories();
+
+        const loadCategoryWithChildren = async (
+            category: Category,
+            level: number = 0,
+            parentPath: string = ''
+        ): Promise<CategoryWithHierarchy> => {
+            const fullPath = parentPath ? `${parentPath} → ${category.name}` : category.name;
+
+            try {
+                const children = await fetchCategories(category.id);
+
+                const childrenWithHierarchy = await Promise.all(
+                    children.map(child => loadCategoryWithChildren(child, level + 1, fullPath))
+                );
+
+                return {
+                    ...category,
+                    level,
+                    fullPath,
+                    children: childrenWithHierarchy
+                };
+            } catch (error) {
+                console.warn(`No se pudieron cargar subcategorías para ${category.name}:`, error);
+                return {
+                    ...category,
+                    level,
+                    fullPath,
+                    children: []
+                };
+            }
+        };
+
+        const categoriesWithHierarchy = await Promise.all(
+            rootCategories.map(category => loadCategoryWithChildren(category))
+        );
+
+        return categoriesWithHierarchy;
+    } catch (error) {
+        console.error('Error al cargar categorías con jerarquía:', error);
+        throw error;
+    }
+}
+
+export function flattenCategoryHierarchy(categories: CategoryWithHierarchy[]): CategoryWithHierarchy[] {
+    const result: CategoryWithHierarchy[] = [];
+
+    const flatten = (cats: CategoryWithHierarchy[]) => {
+        cats.forEach(category => {
+            result.push({
+                ...category,
+                children: undefined
+            });
+
+            if (category.children && category.children.length > 0) {
+                flatten(category.children);
+            }
+        });
+    };
+
+    flatten(categories);
+    return result;
+}
+
+export function getCategoryPath(categoryId: string, flatCategories: CategoryWithHierarchy[]): string {
+    const category = flatCategories.find(cat => cat.id === categoryId);
+    return category ? category.fullPath : '';
+}
+
+export function filterCategoriesByLevel(categories: CategoryWithHierarchy[], level: number): CategoryWithHierarchy[] {
+    return categories.filter(cat => cat.level === level);
+}
+
+
+export function getLeafCategories(categoriesHierarchy: CategoryWithHierarchy[]): CategoryWithHierarchy[] {
+    const result: CategoryWithHierarchy[] = [];
+
+    const findLeafs = (cats: CategoryWithHierarchy[]) => {
+        cats.forEach(category => {
+            if (!category.children || category.children.length === 0) {
+                result.push(category);
+            } else {
+                findLeafs(category.children);
+            }
+        });
+    };
+
+    findLeafs(categoriesHierarchy);
+    return result;
+}

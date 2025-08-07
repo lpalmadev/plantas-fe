@@ -19,6 +19,31 @@ export function useCategories() {
     return { categories, loading, error, refetch, loadCategories, clearError };
 }
 
+export function useCategoriesWithHierarchy() {
+    const {
+        categoriesHierarchy,
+        flatCategories,
+        loading,
+        error,
+        loadAllCategoriesWithHierarchy,
+        clearError
+    } = useCategoryStore();
+
+    const refetch = useCallback(() => {
+        loadAllCategoriesWithHierarchy();
+    }, [loadAllCategoriesWithHierarchy]);
+
+    return {
+        categoriesHierarchy,
+        flatCategories,
+        loading,
+        error,
+        refetch,
+        loadAllCategoriesWithHierarchy,
+        clearError
+    };
+}
+
 export function useCategoryOperations() {
     const { loadCategories } = useCategoryStore();
     const [saving, setSaving] = useState(false);
